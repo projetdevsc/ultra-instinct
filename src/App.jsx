@@ -193,7 +193,7 @@ function ExCard({exId,alts,onRest,nSets,swaps,onSwap}){
   </div>);
 }
 
-function Nav({active,go}){return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"rgba(13,18,32,0.96)",backdropFilter:"blur(24px)",borderTop:`1px solid ${T.bdM}`,display:"flex",padding:"6px 0 20px"}}>
+function Nav({active,go}){return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"rgba(13,18,32,0.96)",backdropFilter:"blur(24px)",borderTop:`1px solid ${T.bdM}`,display:"flex",padding:"6px 0 calc(8px + env(safe-area-inset-bottom, 12px))"}}>
   {[{id:"home",i:"⚡",l:"Home"},{id:"stats",i:"📊",l:"Stats"},{id:"history",i:"📋",l:"Historique"},{id:"photos",i:"📸",l:"Photos"}].map(x=><div key={x.id} onClick={()=>go(x.id)} style={{flex:1,textAlign:"center",cursor:"pointer",padding:"4px 0"}}><div style={{fontSize:18,marginBottom:2}}>{x.i}</div><div style={{fontSize:9,fontWeight:700,letterSpacing:"0.8px",color:active===x.id?T.blL:T.t4}}>{x.l}</div></div>)}
 </div>)}
 
@@ -236,14 +236,18 @@ export default function App(){
 
   const css=`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=number]{-moz-appearance:textfield}body{margin:0;background:${T.bg}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes auraFloat{0%,100%{opacity:0.5;transform:translateY(0)}50%{opacity:0.9;transform:translateY(-8px)}}`;
-  const shell={fontFamily:"'Outfit',-apple-system,sans-serif",background:T.bg,color:T.w,minHeight:"100vh",paddingBottom:76,position:"relative"};
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes auraFloat{0%,100%{opacity:0.5;transform:translateY(0)}50%{opacity:0.9;transform:translateY(-8px)}}
+    @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(192,208,255,0.15))}50%{filter:drop-shadow(0 0 35px rgba(192,208,255,0.3))}}`;
+  const safeTop="env(safe-area-inset-top, 20px)";
+  const shell={fontFamily:"'Outfit',-apple-system,sans-serif",background:T.bg,color:T.w,minHeight:"100vh",paddingBottom:"calc(76px + env(safe-area-inset-bottom, 0px))",position:"relative"};
 
   /* ═══ HOME ═══ */
   if(scr==="home"){return(<div style={shell}><style>{css}</style>
     <div style={{position:"fixed",top:"-25%",left:"5%",width:"90%",height:"55%",background:"radial-gradient(ellipse,rgba(112,144,255,0.07),rgba(168,140,255,0.04) 45%,transparent 75%)",pointerEvents:"none",animation:"auraFloat 8s ease-in-out infinite"}}/>
     <div style={{position:"relative",zIndex:1}}>
-      <div style={{padding:"52px 24px 38px",textAlign:"center"}}><Logo sz="lg"/></div>
+      <div style={{padding:`calc(20px + ${safeTop}) 24px 30px`,textAlign:"center"}}>
+        <img src="/icon.png" alt="" style={{width:80,height:80,borderRadius:20,marginBottom:16,boxShadow:"0 0 40px rgba(112,144,255,0.15)",animation:"logoGlow 4s ease-in-out infinite"}}/>
+        <Logo sz="lg"/></div>
       <div style={{padding:"0 16px"}}>
         <div style={{fontSize:10,fontWeight:800,color:T.t4,letterSpacing:"3px",textTransform:"uppercase",marginBottom:14,paddingLeft:2}}>Routines</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
@@ -266,7 +270,7 @@ export default function App(){
 
   /* ═══ WORKOUT ═══ */
   if(scr==="workout"){return(<div style={shell}><style>{css}</style>
-    <div style={{position:"sticky",top:0,zIndex:50,padding:"14px 16px",background:"rgba(13,18,32,0.95)",backdropFilter:"blur(24px)",borderBottom:`1px solid ${T.bdM}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+    <div style={{position:"sticky",top:0,zIndex:50,padding:`calc(10px + ${safeTop}) 16px 14px`,background:"rgba(13,18,32,0.95)",backdropFilter:"blur(24px)",borderBottom:`1px solid ${T.bdM}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
         <button onClick={reset} style={{width:34,height:34,borderRadius:9,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:16,fontWeight:700,padding:0}}>←</button>
         <div><div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -288,7 +292,7 @@ export default function App(){
   if(scr==="summary"){return(<div style={shell}><style>{css}</style>
     <div style={{position:"fixed",top:"8%",left:"50%",transform:"translateX(-50%)",width:300,height:300,background:"radial-gradient(circle,rgba(92,232,250,0.08),rgba(112,144,255,0.04) 45%,transparent 75%)",pointerEvents:"none",animation:"auraFloat 6s ease-in-out infinite"}}/>
     <div style={{position:"relative",zIndex:1}}>
-      <div style={{padding:"52px 24px 28px",textAlign:"center"}}>
+      <div style={{padding:`calc(20px + ${safeTop}) 24px 28px`,textAlign:"center"}}>
         <div style={{width:72,height:72,borderRadius:"50%",margin:"0 auto 18px",background:"rgba(92,232,250,0.06)",border:"1.5px solid rgba(92,232,250,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,boxShadow:"0 0 50px rgba(92,232,250,0.1)",animation:"fadeUp 0.5s ease both"}}>⚡</div>
         <div style={{fontSize:26,fontWeight:900,background:T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:"drop-shadow(0 0 16px rgba(192,208,255,0.2))",animation:"fadeUp 0.4s ease 0.1s both"}}>Séance terminée</div>
         <p style={{margin:"10px 0 0",fontSize:14,color:T.t3,fontWeight:500,animation:"fadeUp 0.4s ease 0.15s both"}}>{routine.emoji} {routine.name} · {fm(elapsed)}</p></div>
@@ -309,7 +313,7 @@ export default function App(){
     const[histView,setHistView]=useState("chrono"); // chrono | routine
     const grouped={};sessHist.forEach(s=>{if(!grouped[s.routine])grouped[s.routine]=[];grouped[s.routine].push(s)});
     return(<div style={shell}><style>{css}</style>
-    <div style={{padding:"48px 20px 16px"}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:22,fontWeight:800,color:T.w}}>Historique</h2></div>
+    <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:22,fontWeight:800,color:T.w}}>Historique</h2></div>
     <div style={{display:"flex",padding:"0 16px",gap:6,marginBottom:16}}>
       {[{id:"chrono",l:"📅 Chronologique"},{id:"routine",l:"🏋️ Par routine"}].map(t=>(<button key={t.id} onClick={()=>setHistView(t.id)} style={{flex:1,padding:"9px 8px",borderRadius:10,cursor:"pointer",fontSize:12,fontWeight:700,background:histView===t.id?"rgba(112,144,255,0.1)":"rgba(180,200,255,0.03)",border:`1px solid ${histView===t.id?"rgba(112,144,255,0.25)":T.bd}`,color:histView===t.id?T.blL:T.t3}}>{t.l}</button>))}</div>
     <div style={{padding:"0 16px",paddingBottom:80}}>
@@ -348,7 +352,7 @@ export default function App(){
     const vol=[{m:"Quadriceps",s:16,t:16,c:T.bl},{m:"Ischio-jambiers",s:10,t:10,c:T.vi},{m:"Pectoraux",s:14,t:15,c:T.pk},{m:"Dos",s:14,t:15,c:T.cy},{m:"Épaules",s:11,t:11,c:T.wa},{m:"Biceps",s:8,t:8,c:T.gn},{m:"Triceps",s:8,t:8,c:"#E8A08A"},{m:"Mollets",s:8,t:8,c:T.t2}];
 
     return(<div style={shell}><style>{css}</style>
-      <div style={{padding:"48px 20px 16px"}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:22,fontWeight:800,color:T.w}}>Statistiques</h2></div>
+      <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:22,fontWeight:800,color:T.w}}>Statistiques</h2></div>
       <div style={{display:"flex",padding:"0 16px",gap:6,marginBottom:16}}>
         {[{id:"prs",l:"🏆 PRs"},{id:"progress",l:"📈 Courbes"},{id:"volume",l:"💪 Volume"}].map(t=>(<button key={t.id} onClick={()=>{setSTab(t.id);setSelEx(null)}} style={{flex:1,padding:"9px 8px",borderRadius:10,cursor:"pointer",fontSize:12,fontWeight:700,background:sTab===t.id?"rgba(112,144,255,0.1)":"rgba(180,200,255,0.03)",border:`1px solid ${sTab===t.id?"rgba(112,144,255,0.25)":T.bd}`,color:sTab===t.id?T.blL:T.t3}}>{t.l}</button>))}</div>
       <div style={{padding:"0 16px",paddingBottom:80}}>
