@@ -183,7 +183,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const swap=nId=>{setAId(nId);onSwap(exId,nId);setRest(EX[nId]?.rest||120);setSets(Array(nSets).fill(null).map(()=>({kg:0,reps:0,done:false})));setPrs([]);setShowSwap(false);setSearch("");setObjInput(customObjs[nId]?.text||OBJ[nId]||"")};
   const setObjMode=(mode)=>{let text="";if(mode==="up"&&lp)text=`${lp.kg+5}kg × ${lp.r}`;else if(mode==="stable"&&lp)text=`${lp.kg}kg × ${lp.r+2}`;else if(mode==="custom")text=objInput||defaultObj;else text=defaultObj;setObjInput(text);onObjChange(aId,{mode,text});setShowObj(false)};
   const saveCustomObj=()=>{onObjChange(aId,{mode:"custom",text:objInput});setShowObj(false)};
-  return(<div style={{background:allD?"linear-gradient(135deg,rgba(92,232,250,0.04),rgba(112,144,255,0.03))":T.bgCard,border:`1px solid ${allD?"rgba(92,232,250,0.12)":T.bd}`,borderRadius:16,marginBottom:10,overflow:"hidden"}}>
+  return(<div style={{background:allD?"linear-gradient(135deg,rgba(92,232,250,0.04),rgba(112,144,255,0.03))":T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${allD?"rgba(92,232,250,0.12)":T.bd}`,borderRadius:16,marginBottom:10}}>
     <div onClick={()=>setOpen(!open)} style={{padding:"13px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:open?`1px solid ${T.bd}`:"none"}}>
       <div style={{flex:1}}><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
         <span style={{fontSize:sz(15,fSc),fontWeight:700,color:T.w}}>{ax.name}</span>
@@ -410,7 +410,7 @@ export default function App(){
     @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(192,208,255,0.15))}50%{filter:drop-shadow(0 0 35px rgba(192,208,255,0.3))}}`;
   const safeTop="env(safe-area-inset-top, 20px)";
   const shell={fontFamily:"'Outfit',-apple-system,sans-serif",background:T.bg,color:T.w,minHeight:"100vh",paddingBottom:"calc(80px + env(safe-area-inset-bottom, 0px))",position:"relative"};
-  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)"};
+  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,border:`1px solid ${T.bd}`,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)"};
   const tabBtn=(active)=>({flex:1,padding:"9px 8px",borderRadius:10,cursor:"pointer",fontSize:sz(12,fSc),fontWeight:700,background:active?"rgba(112,144,255,0.08)":"rgba(180,200,255,0.02)",border:`1px solid ${active?"rgba(112,144,255,0.2)":T.bd}`,color:active?T.blL:T.t3,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"});
 
   /* ═══ HOME ═══ */
@@ -449,8 +449,7 @@ export default function App(){
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {Object.entries(routines).map(([key,r],idx)=>{const ld=lastDates[key];return(
             <div key={key} style={{position:"relative",animation:`fadeUp 0.4s ease ${0.15+idx*0.08}s both`}}>
-              <button onClick={()=>goR(key)} style={{width:"100%",padding:"20px 16px 16px",borderRadius:16,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,textAlign:"left",position:"relative",overflow:"hidden"}}>
-                <div style={{position:"absolute",top:-10,right:-10,width:70,height:70,background:"radial-gradient(circle,rgba(112,144,255,0.06),transparent 70%)",pointerEvents:"none"}}/>
+              <button onClick={()=>goR(key)} style={{width:"100%",padding:"20px 16px 16px",borderRadius:16,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,textAlign:"left",position:"relative"}}>
                 <div style={{position:"relative"}}>
                   <div style={{fontSize:28,marginBottom:6}}>{r.emoji}</div>
                   <div style={{fontSize:9,fontWeight:700,letterSpacing:"1.5px",color:T.bl,marginBottom:6}}>{r.tag}</div>
