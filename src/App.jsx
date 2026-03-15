@@ -148,11 +148,11 @@ function RestTimer({duration,exName,onDone,onSkip}){
     <div style={{padding:"18px 24px 32px",display:"flex",justifyContent:"space-between",alignItems:"center",position:"relative"}}>
       <div><div style={{fontSize:11,fontWeight:700,color:urg?T.pkS:T.bl,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:8}}>⏱ Repos · {exName}</div>
         <div style={{fontSize:52,fontWeight:900,lineHeight:1,fontVariantNumeric:"tabular-nums",background:urg?"linear-gradient(135deg,#E280FF,#FF70B0)":T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:urg?"drop-shadow(0 0 12px rgba(226,128,255,0.35))":"drop-shadow(0 0 8px rgba(192,208,255,0.15))"}}>{fm(rem)}</div></div>
-      <button onClick={onSkip} style={{padding:"11px 24px",borderRadius:11,cursor:"pointer",background:T.bgCard,border:`1px solid ${T.bdM}`,color:T.t2,fontSize:13,fontWeight:700}}>Skip →</button>
+      <button onClick={onSkip} style={{padding:"11px 24px",borderRadius:11,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:13,fontWeight:700}}>Skip →</button>
     </div></div>);
 }
 function RC({val,set}){const[o,sO]=useState(false);return(<div style={{position:"relative"}}><button onClick={e=>{e.stopPropagation();sO(!o)}} style={{padding:"4px 10px",borderRadius:7,cursor:"pointer",background:T.bgInput,border:`1px solid ${T.bdM}`,color:T.bl,fontSize:11,fontWeight:700,fontFamily:"monospace",display:"flex",alignItems:"center",gap:4}}><span style={{fontSize:10}}>⏱</span>{fm(val)}</button>
-  {o&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:"100%",right:0,marginTop:6,zIndex:90,background:T.bgEl,border:`1px solid ${T.bdM}`,borderRadius:12,padding:6,width:190,display:"flex",flexWrap:"wrap",gap:4,boxShadow:"0 12px 48px rgba(0,0,0,0.6)"}}>
+  {o&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:"100%",right:0,marginTop:6,zIndex:90,background:T.bgEl,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,borderRadius:12,padding:6,width:190,display:"flex",flexWrap:"wrap",gap:4,boxShadow:"0 12px 48px rgba(0,0,0,0.6)"}}>
     {RO.map(d=><button key={d} onClick={()=>{set(d);sO(false)}} style={{padding:"7px 0",borderRadius:8,cursor:"pointer",flex:"1 0 52px",textAlign:"center",background:d===val?"rgba(112,144,255,0.14)":"rgba(180,200,255,0.03)",border:`1px solid ${d===val?"rgba(112,144,255,0.3)":T.bd}`,color:d===val?T.blL:T.t3,fontSize:12,fontWeight:700,fontFamily:"monospace"}}>{fm(d)}</button>)}</div>}</div>);
 }
 function SR({i,prev,cur,up,val,done,isPR,fSc}){
@@ -410,7 +410,7 @@ export default function App(){
     @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(192,208,255,0.15))}50%{filter:drop-shadow(0 0 35px rgba(192,208,255,0.3))}}`;
   const safeTop="env(safe-area-inset-top, 20px)";
   const shell={fontFamily:"'Outfit',-apple-system,sans-serif",background:T.bg,color:T.w,minHeight:"100vh",paddingBottom:"calc(80px + env(safe-area-inset-bottom, 0px))",position:"relative"};
-  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,border:`1px solid ${T.bd}`,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)"};
+  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)"};
   const tabBtn=(active)=>({flex:1,padding:"9px 8px",borderRadius:10,cursor:"pointer",fontSize:sz(12,fSc),fontWeight:700,background:active?"rgba(112,144,255,0.08)":"rgba(180,200,255,0.02)",border:`1px solid ${active?"rgba(112,144,255,0.2)":T.bd}`,color:active?T.blL:T.t3,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"});
 
   /* ═══ HOME ═══ */
@@ -418,7 +418,7 @@ export default function App(){
     const wPct=Math.min(waterToday.total/waterGoal*100,100);
     return(<div style={shell}><style>{css}</style>
     {/* Goku full background */}
-    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.3,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.4,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
     <div style={{position:"relative",zIndex:1}}>
       {/* Logo + Countdown */}
       <div style={{textAlign:"center",paddingTop:`calc(30px + ${safeTop})`,paddingBottom:12}}>
@@ -449,7 +449,7 @@ export default function App(){
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {Object.entries(routines).map(([key,r],idx)=>{const ld=lastDates[key];return(
             <div key={key} style={{position:"relative",animation:`fadeUp 0.4s ease ${0.15+idx*0.08}s both`}}>
-              <button onClick={()=>goR(key)} style={{width:"100%",padding:"20px 16px 16px",borderRadius:16,cursor:"pointer",background:T.bgCard,border:`1px solid ${T.bd}`,textAlign:"left",position:"relative",overflow:"hidden"}}>
+              <button onClick={()=>goR(key)} style={{width:"100%",padding:"20px 16px 16px",borderRadius:16,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,textAlign:"left",position:"relative",overflow:"hidden"}}>
                 <div style={{position:"absolute",top:-10,right:-10,width:70,height:70,background:"radial-gradient(circle,rgba(112,144,255,0.06),transparent 70%)",pointerEvents:"none"}}/>
                 <div style={{position:"relative"}}>
                   <div style={{fontSize:28,marginBottom:6}}>{r.emoji}</div>
@@ -470,7 +470,7 @@ export default function App(){
     const isNew=editKey.startsWith("new_")||editKey.startsWith("dup_");
     const emojis=["💪","🦵","🏋️","⚡","🔥","💎","🎯","🚀","💥","🏆"];
     return(<div style={shell}><style>{css}</style>
-    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.3,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.4,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
     <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -541,7 +541,7 @@ export default function App(){
     const wPct=Math.min(waterToday.total/waterGoal*100,100);
     const wHist=DB.getWaterHistory(7);const maxW=Math.max(...wHist.map(d=>d.total),waterGoal);
     return(<div style={shell}><style>{css}</style>
-    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.3,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.4,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
     <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Quotidien</h2></div>
     <div style={{display:"flex",padding:"0 16px",gap:6,marginBottom:16}}>
       {[{id:"water",l:"💧 Eau"},{id:"macros",l:"🍎 Macros"},{id:"report",l:"📋 Rapport"}].map(t=><button key={t.id} onClick={()=>setDailyTab(t.id)} style={tabBtn(dailyTab===t.id)}>{t.l}</button>)}</div>
@@ -613,7 +613,7 @@ export default function App(){
             <button onClick={()=>removeEx(i)} style={{width:26,height:22,borderRadius:6,cursor:"pointer",background:"rgba(226,128,255,0.06)",border:"1px solid rgba(226,128,255,0.15)",color:T.pk,fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>✕</button></div>
           <ExCard exId={exId} slotKey={slotKeys[i]} alts={routine.alts[exId]} onRest={tRest} nSets={routine.sets} swaps={swaps} onSwap={handleSwap} onData={handleExData} customObjs={customObjs} onObjChange={handleObjChange} fSc={fSc}/></div>))}
       {!showAddEx&&<button onClick={()=>setShowAddEx(true)} style={{width:"100%",padding:"14px",marginTop:8,background:"rgba(112,144,255,0.06)",border:"1.5px dashed rgba(112,144,255,0.25)",borderRadius:14,color:T.blL,fontSize:sz(13,fSc),fontWeight:700,cursor:"pointer"}}>+ Ajouter un exercice</button>}
-      {showAddEx&&<div style={{marginTop:8,padding:"16px",borderRadius:16,background:T.bgCard,border:`1px solid ${T.bdM}`,animation:"fadeUp 0.3s ease both"}}>
+      {showAddEx&&<div style={{marginTop:8,padding:"16px",borderRadius:16,background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,animation:"fadeUp 0.3s ease both"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
           <div style={{fontSize:10,fontWeight:800,color:T.bl,letterSpacing:"1.5px",textTransform:"uppercase"}}>Ajouter un exercice</div>
           <button onClick={()=>{setShowAddEx(false);setAddExSearch("")}} style={{padding:"4px 10px",borderRadius:7,cursor:"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:T.t3,fontSize:11,fontWeight:700}}>✕</button></div>
@@ -646,8 +646,8 @@ export default function App(){
           <div style={{fontSize:sz(12,fSc),color:T.t2,marginBottom:12,lineHeight:1.6}}>Ajoute tes notes puis copie le rapport pour débriefer</div>
           <textarea value={sessionNotes} onChange={e=>setSessionNotes(e.target.value)} placeholder={"Tes ressentis, questions, ajustements...\nEx: Hack squat facile → monter à 150kg ?"} rows={4} style={{width:"100%",padding:"12px",borderRadius:10,background:T.bgInput,border:`1px solid ${T.bdM}`,color:T.w,fontSize:sz(13,fSc),outline:"none",fontFamily:"inherit",resize:"vertical",lineHeight:1.6,marginBottom:12,minHeight:80}}/>
           <button onClick={handleCopyReport} style={{width:"100%",padding:"13px",borderRadius:10,cursor:"pointer",background:copied?"rgba(92,232,250,0.15)":"rgba(112,144,255,0.1)",border:`1.5px solid ${copied?"rgba(92,232,250,0.35)":"rgba(112,144,255,0.28)"}`,color:copied?T.cy:T.blL,fontSize:sz(14,fSc),fontWeight:700,transition:"all 0.3s"}}>{copied?"✅ Copié !":"📋 Copier le rapport"}</button>
-          {reportText&&<div style={{marginTop:12,textAlign:"left",padding:"12px",borderRadius:10,background:"rgba(0,0,0,0.2)",maxHeight:160,overflowY:"auto"}}><pre style={{margin:0,fontSize:10,color:T.t3,whiteSpace:"pre-wrap",fontFamily:"monospace",lineHeight:1.5}}>{reportText.slice(0,400)}{reportText.length>400?"...":""}</pre></div>}</div>
-        <button onClick={resetToHome} style={{width:"100%",padding:"14px",borderRadius:12,cursor:"pointer",background:T.bgCard,border:`1px solid ${T.bd}`,color:T.t2,fontSize:sz(14,fSc),fontWeight:600}}>Retour</button>
+          {reportText&&<div style={{marginTop:12,textAlign:"left",padding:"12px",borderRadius:10,background:"rgba(13,18,32,0.3)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",maxHeight:160,overflowY:"auto"}}><pre style={{margin:0,fontSize:10,color:T.t3,whiteSpace:"pre-wrap",fontFamily:"monospace",lineHeight:1.5}}>{reportText.slice(0,400)}{reportText.length>400?"...":""}</pre></div>}</div>
+        <button onClick={resetToHome} style={{width:"100%",padding:"14px",borderRadius:12,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,color:T.t2,fontSize:sz(14,fSc),fontWeight:600}}>Retour</button>
       </div></div></div>)}
 
   /* ═══ SESSIONS (Stats + Historique + 1RM fusionnés) ═══ */
@@ -660,7 +660,7 @@ export default function App(){
     const rmBoard=Object.entries(EX).filter(([_,e])=>e.hist?.length>0).map(([id,e])=>{const best=e.hist.reduce((b,h)=>{const rm=e1rm(h.kg,h.r);return rm>b.rm?{...h,rm,id}:b},{rm:0,id});return{id,name:e.name,muscle:e.muscle,rm:best.rm,kg:best.kg,r:best.r}}).filter(x=>x.rm>0).sort((a,b)=>b.rm-a.rm);
 
     return(<div style={shell}><style>{css}</style>
-    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.3,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.4,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
       <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Séances</h2></div>
       <div style={{display:"flex",padding:"0 16px",gap:4,marginBottom:16,flexWrap:"wrap"}}>
         {[{id:"prs",l:"🏆 PRs"},{id:"1rm",l:"💎 1RM"},{id:"progress",l:"📈 Courbes"},{id:"volume",l:"💪 Volume"},{id:"chrono",l:"📅 Historique"},{id:"routine",l:"🔁 Routines"}].map(t=>(
@@ -689,7 +689,7 @@ export default function App(){
 
         {/* Progress */}
         {sTab==="progress"&&<div>{selEx?(<div>
-          <button onClick={()=>setSelEx(null)} style={{padding:"6px 14px",borderRadius:8,cursor:"pointer",background:T.bgCard,border:`1px solid ${T.bdM}`,color:T.t2,fontSize:12,fontWeight:600,marginBottom:12}}>← Retour</button>
+          <button onClick={()=>setSelEx(null)} style={{padding:"6px 14px",borderRadius:8,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:12,fontWeight:600,marginBottom:12}}>← Retour</button>
           <div style={{...card,padding:"16px"}}>
             <div style={{fontSize:sz(16,fSc),fontWeight:800,color:T.w,marginBottom:4}}>{EX[selEx].name}</div>
             <div style={{fontSize:sz(11,fSc),color:T.t3,marginBottom:12}}>{EX[selEx].muscle} · {EX[selEx].hist.length} séances · 1RM: {e1rm(EX[selEx].hist[EX[selEx].hist.length-1].kg,EX[selEx].hist[EX[selEx].hist.length-1].r)}kg</div>
@@ -749,13 +749,13 @@ export default function App(){
     const handleAddMensur=()=>{const entry={date:formData.date};MENSUR_FIELDS.forEach(f=>{if(formData[f.key]&&formData[f.key]!=="")entry[f.key]=parseFloat(formData[f.key])});
       if(Object.keys(entry).length>1){setMensur(DB.addMensuration(entry));setShowForm(false);setFormData({date:localDate(),poids:"",bf:"",ventre:"",poitrine:"",cuisse:"",bras:"",muscle:"",meta:""})}};
     return(<div style={shell}><style>{css}</style>
-    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.3,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.4,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
       <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
           <h2 style={{margin:0,fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Corps</h2>
           <button onClick={()=>setShowForm(!showForm)} style={{padding:"8px 16px",borderRadius:10,cursor:"pointer",background:showForm?"rgba(226,128,255,0.1)":"rgba(112,144,255,0.1)",border:`1px solid ${showForm?"rgba(226,128,255,0.25)":"rgba(112,144,255,0.25)"}`,color:showForm?T.pk:T.blL,fontSize:sz(12,fSc),fontWeight:700}}>{showForm?"✕ Fermer":"+ Mesure"}</button></div></div>
       {showForm&&<div style={{padding:"0 16px",marginBottom:16,animation:"fadeUp 0.3s ease both"}}>
-        <div style={{padding:"16px",borderRadius:16,background:T.bgCard,border:`1px solid ${T.bdM}`}}>
+        <div style={{padding:"16px",borderRadius:16,background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`}}>
           <div style={{fontSize:10,fontWeight:800,color:T.vi,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:12}}>📐 Nouvelle mesure</div>
           <div style={{marginBottom:12}}><label style={{fontSize:11,color:T.t3,fontWeight:600,display:"block",marginBottom:4}}>Date</label>
             <input type="date" value={formData.date} onChange={e=>setFormData(p=>({...p,date:e.target.value}))} style={{width:"100%",padding:"10px 12px",borderRadius:9,background:T.bgInput,border:`1px solid ${T.bdM}`,color:T.w,fontSize:14,outline:"none",fontFamily:"inherit"}}/></div>
@@ -796,7 +796,7 @@ export default function App(){
     const handleReset=()=>{DB.resetAll();setSwaps({});setCustomObjs({});setSessHist(INIT_HISTORY);setLastDates({...LAST_SESSIONS});setMensur([...INIT_MENSUR]);setRoutines({...INIT_ROUTINES});setSettings({fontSize:"normal",waterGoal:3000});setShowReset(false)};
     const lastExp=DB.getLastExport();const expDays=lastExp?Math.floor((new Date()-new Date(lastExp+"T12:00:00"))/(1000*60*60*24)):null;
     return(<div style={shell}><style>{css}</style>
-    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.3,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.4,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
       <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Réglages</h2></div>
       <div style={{padding:"0 16px",paddingBottom:80}}>
         <div style={{...card,marginBottom:10,animation:"fadeUp 0.3s ease both"}}>
