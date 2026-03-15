@@ -84,8 +84,8 @@ const INIT_HISTORY=[
 ];
 
 /* ─── THEME ─── */
-const T={bg:"#0D1220",bgCard:"#131B2E",bgInput:"#192640",bgEl:"#1C2A48",
-  bd:"rgba(180,200,255,0.07)",bdM:"rgba(180,200,255,0.12)",
+const T={bg:"#0D1220",bgCard:"rgba(19,27,46,0.55)",bgInput:"rgba(25,38,64,0.6)",bgEl:"rgba(28,42,72,0.65)",
+  bd:"rgba(180,200,255,0.08)",bdM:"rgba(180,200,255,0.14)",
   w:"#F0F3FF",t1:"#D8DFF5",t2:"#9AA4C4",t3:"#6672A0",t4:"#3E4A70",
   bl:"#7090FF",blL:"#9CB5FF",vi:"#A88CFF",cy:"#5CE8FA",pk:"#E280FF",pkS:"#F0AAFF",wa:"#FFB86E",gn:"#8AE8A0",
   aura:"linear-gradient(135deg,#7090FF 0%,#A88CFF 45%,#E280FF 100%)",
@@ -217,7 +217,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
 }
 
 /* ─── NAV (5 tabs) ─── */
-function Nav({active,go}){return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"rgba(13,18,32,0.96)",backdropFilter:"blur(24px)",borderTop:`1px solid ${T.bdM}`,display:"flex",padding:"8px 0 calc(10px + env(safe-area-inset-bottom, 12px))"}}>
+function Nav({active,go}){return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"rgba(13,18,32,0.75)",backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",borderTop:`1px solid ${T.bdM}`,display:"flex",padding:"8px 0 calc(10px + env(safe-area-inset-bottom, 12px))"}}>
   {[{id:"home",i:"⚡",l:"Home"},{id:"daily",i:"💧",l:"Quotidien"},{id:"sessions",i:"🏋️",l:"Séances"},{id:"body",i:"📐",l:"Corps"},{id:"settings",i:"⚙️",l:"Réglages"}].map(x=><div key={x.id} onClick={()=>go(x.id)} style={{flex:1,textAlign:"center",cursor:"pointer",padding:"2px 0"}}><div style={{fontSize:20,marginBottom:3}}>{x.i}</div><div style={{fontSize:10,fontWeight:700,letterSpacing:"0.5px",color:active===x.id?T.blL:T.t4}}>{x.l}</div></div>)}
 </div>)}
 
@@ -410,7 +410,7 @@ export default function App(){
     @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(192,208,255,0.15))}50%{filter:drop-shadow(0 0 35px rgba(192,208,255,0.3))}}`;
   const safeTop="env(safe-area-inset-top, 20px)";
   const shell={fontFamily:"'Outfit',-apple-system,sans-serif",background:T.bg,color:T.w,minHeight:"100vh",paddingBottom:"calc(80px + env(safe-area-inset-bottom, 0px))",position:"relative"};
-  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,border:`1px solid ${T.bd}`};
+  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,border:`1px solid ${T.bd}`,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)"};
   const tabBtn=(active)=>({flex:1,padding:"9px 8px",borderRadius:10,cursor:"pointer",fontSize:sz(12,fSc),fontWeight:700,background:active?"rgba(112,144,255,0.1)":"rgba(180,200,255,0.03)",border:`1px solid ${active?"rgba(112,144,255,0.25)":T.bd}`,color:active?T.blL:T.t3});
 
   /* ═══ HOME ═══ */
@@ -593,7 +593,7 @@ export default function App(){
     const allExForAdd=Object.entries(EX).map(([id,e])=>({id,name:e.name,muscle:e.muscle}));
     const addF=addExSearch.length>0?allExForAdd.filter(e=>e.name.toLowerCase().includes(addExSearch.toLowerCase())||e.muscle.toLowerCase().includes(addExSearch.toLowerCase())):[];
     return(<div style={shell}><style>{css}</style>
-    <div style={{position:"sticky",top:0,zIndex:50,padding:`calc(10px + ${safeTop}) 16px 14px`,background:"rgba(13,18,32,0.95)",backdropFilter:"blur(24px)",borderBottom:`1px solid ${T.bdM}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+    <div style={{position:"sticky",top:0,zIndex:50,padding:`calc(10px + ${safeTop}) 16px 14px`,background:"rgba(13,18,32,0.7)",backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",borderBottom:`1px solid ${T.bdM}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
         <button onClick={resetToHome} style={{width:34,height:34,borderRadius:9,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:16,fontWeight:700,padding:0}}>←</button>
         <div><div style={{display:"flex",alignItems:"center",gap:10}}>
