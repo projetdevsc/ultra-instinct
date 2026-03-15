@@ -419,9 +419,8 @@ export default function App(){
     return(<div style={shell}><style>{css}</style>
     <div style={{position:"relative",zIndex:1}}>
       {/* Hero zone — Goku + Logo + Countdown */}
-      <div style={{position:"relative",textAlign:"center",overflow:"hidden",paddingTop:`calc(${safeTop})`}}>
-        <img src="/goku_home.png" alt="" style={{width:"100%",maxWidth:320,margin:"0 auto",display:"block",opacity:0.18,position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",pointerEvents:"none",maskImage:"linear-gradient(to bottom, black 60%, transparent 100%)",WebkitMaskImage:"linear-gradient(to bottom, black 60%, transparent 100%)"}}/>
-        <div style={{position:"relative",padding:"40px 24px 16px"}}>
+      <div style={{position:"relative",textAlign:"center",overflow:"hidden",paddingTop:`calc(${safeTop})`,minHeight:300}}>
+        <img src="/goku_home.png" alt="" style={{width:"100%",maxWidth:360,display:"block",opacity:0.35,position:"absolute",top:10,left:"50%",transform:"translateX(-50%)",pointerEvents:"none",maskImage:"linear-gradient(to bottom, black 75%, transparent 100%)",WebkitMaskImage:"linear-gradient(to bottom, black 75%, transparent 100%)",filter:"drop-shadow(0 0 25px rgba(112,144,255,0.15))"}}/>        <div style={{position:"relative",padding:"70px 24px 16px"}}>
           <Logo sz="lg"/>
           <div style={{display:"inline-flex",alignItems:"center",gap:8,marginTop:14,padding:"6px 16px",borderRadius:10,background:"rgba(112,144,255,0.08)",border:"1px solid rgba(112,144,255,0.12)"}}>
             <span style={{fontSize:sz(20,fSc),fontWeight:900,background:T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{daysLeft()}</span>
