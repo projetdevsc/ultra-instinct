@@ -84,7 +84,7 @@ const INIT_HISTORY=[
 ];
 
 /* ─── THEME ─── */
-const T={bg:"#0D1220",bgCard:"rgba(19,27,46,0.35)",bgInput:"rgba(25,38,64,0.4)",bgEl:"rgba(28,42,72,0.45)",
+const T={bg:"#0D1220",bgCard:"rgba(19,27,46,0.15)",bgInput:"rgba(25,38,64,0.25)",bgEl:"rgba(28,42,72,0.2)",
   bd:"rgba(180,200,255,0.1)",bdM:"rgba(180,200,255,0.16)",
   w:"#F0F3FF",t1:"#D8DFF5",t2:"#9AA4C4",t3:"#6672A0",t4:"#3E4A70",
   bl:"#7090FF",blL:"#9CB5FF",vi:"#A88CFF",cy:"#5CE8FA",pk:"#E280FF",pkS:"#F0AAFF",wa:"#FFB86E",gn:"#8AE8A0",
@@ -142,17 +142,17 @@ function RestTimer({duration,exName,onDone,onSkip}){
     iR.current=setInterval(()=>{setRem(p=>{if(p<=1){clearInterval(iR.current);cbR.current();return 0}return p-1})},1000);
     return()=>clearInterval(iR.current)},[duration]);
   const pct=((duration-rem)/duration)*100,urg=rem<=10;
-  return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:200,background:`linear-gradient(180deg,rgba(13,18,32,0.97),${T.bg})`,backdropFilter:"blur(28px)",borderTop:`2px solid ${urg?"rgba(226,128,255,0.45)":"rgba(112,144,255,0.2)"}`}}>
+  return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:200,background:`linear-gradient(180deg,rgba(13,18,32,0.97),${T.bg})`,backdropFilter:"blur(8px)",borderTop:`2px solid ${urg?"rgba(226,128,255,0.45)":"rgba(112,144,255,0.2)"}`}}>
     {urg&&<div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",width:200,height:100,background:"radial-gradient(ellipse,rgba(226,128,255,0.15),transparent 70%)",pointerEvents:"none"}}/>}
     <div style={{height:3,background:"rgba(112,144,255,0.08)"}}><div style={{height:"100%",background:urg?"linear-gradient(90deg,#E280FF,#FF70B0)":T.aura,width:`${pct}%`,transition:"width 1s linear",boxShadow:urg?"0 0 20px rgba(226,128,255,0.5)":"0 0 14px rgba(112,144,255,0.3)"}}/></div>
     <div style={{padding:"18px 24px 32px",display:"flex",justifyContent:"space-between",alignItems:"center",position:"relative"}}>
       <div><div style={{fontSize:11,fontWeight:700,color:urg?T.pkS:T.bl,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:8}}>⏱ Repos · {exName}</div>
         <div style={{fontSize:52,fontWeight:900,lineHeight:1,fontVariantNumeric:"tabular-nums",background:urg?"linear-gradient(135deg,#E280FF,#FF70B0)":T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:urg?"drop-shadow(0 0 12px rgba(226,128,255,0.35))":"drop-shadow(0 0 8px rgba(192,208,255,0.15))"}}>{fm(rem)}</div></div>
-      <button onClick={onSkip} style={{padding:"11px 24px",borderRadius:11,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:13,fontWeight:700}}>Skip →</button>
+      <button onClick={onSkip} style={{padding:"11px 24px",borderRadius:11,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:13,fontWeight:700}}>Skip →</button>
     </div></div>);
 }
 function RC({val,set}){const[o,sO]=useState(false);return(<div style={{position:"relative"}}><button onClick={e=>{e.stopPropagation();sO(!o)}} style={{padding:"4px 10px",borderRadius:7,cursor:"pointer",background:T.bgInput,border:`1px solid ${T.bdM}`,color:T.bl,fontSize:11,fontWeight:700,fontFamily:"monospace",display:"flex",alignItems:"center",gap:4}}><span style={{fontSize:10}}>⏱</span>{fm(val)}</button>
-  {o&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:"100%",right:0,marginTop:6,zIndex:90,background:T.bgEl,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,borderRadius:12,padding:6,width:190,display:"flex",flexWrap:"wrap",gap:4,boxShadow:"0 12px 48px rgba(0,0,0,0.6)"}}>
+  {o&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:"100%",right:0,marginTop:6,zIndex:90,background:T.bgEl,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${T.bdM}`,borderRadius:12,padding:6,width:190,display:"flex",flexWrap:"wrap",gap:4,boxShadow:"0 12px 48px rgba(0,0,0,0.6)"}}>
     {RO.map(d=><button key={d} onClick={()=>{set(d);sO(false)}} style={{padding:"7px 0",borderRadius:8,cursor:"pointer",flex:"1 0 52px",textAlign:"center",background:d===val?"rgba(112,144,255,0.14)":"rgba(180,200,255,0.03)",border:`1px solid ${d===val?"rgba(112,144,255,0.3)":T.bd}`,color:d===val?T.blL:T.t3,fontSize:12,fontWeight:700,fontFamily:"monospace"}}>{fm(d)}</button>)}</div>}</div>);
 }
 function SR({i,prev,cur,up,val,done,isPR,fSc}){
@@ -183,7 +183,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const swap=nId=>{setAId(nId);onSwap(exId,nId);setRest(EX[nId]?.rest||120);setSets(Array(nSets).fill(null).map(()=>({kg:0,reps:0,done:false})));setPrs([]);setShowSwap(false);setSearch("");setObjInput(customObjs[nId]?.text||OBJ[nId]||"")};
   const setObjMode=(mode)=>{let text="";if(mode==="up"&&lp)text=`${lp.kg+5}kg × ${lp.r}`;else if(mode==="stable"&&lp)text=`${lp.kg}kg × ${lp.r+2}`;else if(mode==="custom")text=objInput||defaultObj;else text=defaultObj;setObjInput(text);onObjChange(aId,{mode,text});setShowObj(false)};
   const saveCustomObj=()=>{onObjChange(aId,{mode:"custom",text:objInput});setShowObj(false)};
-  return(<div style={{background:allD?"linear-gradient(135deg,rgba(92,232,250,0.04),rgba(112,144,255,0.03))":T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${allD?"rgba(92,232,250,0.12)":T.bd}`,borderRadius:16,marginBottom:10}}>
+  return(<div style={{background:allD?"linear-gradient(135deg,rgba(92,232,250,0.04),rgba(112,144,255,0.03))":T.bgCard,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${allD?"rgba(92,232,250,0.12)":T.bd}`,borderRadius:16,marginBottom:10}}>
     <div onClick={()=>setOpen(!open)} style={{padding:"13px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:open?`1px solid ${T.bd}`:"none"}}>
       <div style={{flex:1}}><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
         <span style={{fontSize:sz(15,fSc),fontWeight:700,color:T.w}}>{ax.name}</span>
@@ -217,7 +217,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
 }
 
 /* ─── NAV (5 tabs) ─── */
-function Nav({active,go}){return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"rgba(13,18,32,0.75)",backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",borderTop:`1px solid ${T.bdM}`,display:"flex",padding:"8px 0 calc(10px + env(safe-area-inset-bottom, 12px))"}}>
+function Nav({active,go}){return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"rgba(13,18,32,0.75)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",borderTop:`1px solid ${T.bdM}`,display:"flex",padding:"8px 0 calc(10px + env(safe-area-inset-bottom, 12px))"}}>
   {[{id:"home",i:"⚡",l:"Home"},{id:"daily",i:"💧",l:"Quotidien"},{id:"sessions",i:"🏋️",l:"Séances"},{id:"body",i:"📐",l:"Corps"},{id:"settings",i:"⚙️",l:"Réglages"}].map(x=><div key={x.id} onClick={()=>go(x.id)} style={{flex:1,textAlign:"center",cursor:"pointer",padding:"2px 0"}}><div style={{fontSize:20,marginBottom:3}}>{x.i}</div><div style={{fontSize:10,fontWeight:700,letterSpacing:"0.5px",color:active===x.id?T.blL:T.t4}}>{x.l}</div></div>)}
 </div>)}
 
@@ -410,8 +410,8 @@ export default function App(){
     @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(192,208,255,0.15))}50%{filter:drop-shadow(0 0 35px rgba(192,208,255,0.3))}}`;
   const safeTop="env(safe-area-inset-top, 20px)";
   const shell={fontFamily:"'Outfit',-apple-system,sans-serif",background:T.bg,color:T.w,minHeight:"100vh",paddingBottom:"calc(80px + env(safe-area-inset-bottom, 0px))",position:"relative"};
-  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,border:`1px solid ${T.bd}`,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)"};
-  const tabBtn=(active)=>({flex:1,padding:"9px 8px",borderRadius:10,cursor:"pointer",fontSize:sz(12,fSc),fontWeight:700,background:active?"rgba(112,144,255,0.08)":"rgba(180,200,255,0.02)",border:`1px solid ${active?"rgba(112,144,255,0.2)":T.bd}`,color:active?T.blL:T.t3,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"});
+  const card={padding:"14px 16px",borderRadius:14,background:T.bgCard,border:`1px solid ${T.bd}`,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"};
+  const tabBtn=(active)=>({flex:1,padding:"9px 8px",borderRadius:10,cursor:"pointer",fontSize:sz(12,fSc),fontWeight:700,background:active?"rgba(112,144,255,0.08)":"rgba(180,200,255,0.02)",border:`1px solid ${active?"rgba(112,144,255,0.2)":T.bd}`,color:active?T.blL:T.t3,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"});
 
   /* ═══ HOME ═══ */
   if(scr==="home"){
@@ -449,7 +449,7 @@ export default function App(){
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {Object.entries(routines).map(([key,r],idx)=>{const ld=lastDates[key];return(
             <div key={key} style={{position:"relative",animation:`fadeUp 0.4s ease ${0.15+idx*0.08}s both`}}>
-              <button onClick={()=>goR(key)} style={{width:"100%",padding:"20px 16px 16px",borderRadius:16,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,textAlign:"left",position:"relative"}}>
+              <button onClick={()=>goR(key)} style={{width:"100%",padding:"20px 16px 16px",borderRadius:16,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${T.bd}`,textAlign:"left",position:"relative"}}>
                 <div style={{position:"relative"}}>
                   <div style={{fontSize:28,marginBottom:6}}>{r.emoji}</div>
                   <div style={{fontSize:9,fontWeight:700,letterSpacing:"1.5px",color:T.bl,marginBottom:6}}>{r.tag}</div>
@@ -592,7 +592,7 @@ export default function App(){
     const allExForAdd=Object.entries(EX).map(([id,e])=>({id,name:e.name,muscle:e.muscle}));
     const addF=addExSearch.length>0?allExForAdd.filter(e=>e.name.toLowerCase().includes(addExSearch.toLowerCase())||e.muscle.toLowerCase().includes(addExSearch.toLowerCase())):[];
     return(<div style={shell}><style>{css}</style>
-    <div style={{position:"sticky",top:0,zIndex:50,padding:`calc(10px + ${safeTop}) 16px 14px`,background:"rgba(13,18,32,0.7)",backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",borderBottom:`1px solid ${T.bdM}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+    <div style={{position:"sticky",top:0,zIndex:50,padding:`calc(10px + ${safeTop}) 16px 14px`,background:"rgba(13,18,32,0.7)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",borderBottom:`1px solid ${T.bdM}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
         <button onClick={resetToHome} style={{width:34,height:34,borderRadius:9,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:16,fontWeight:700,padding:0}}>←</button>
         <div><div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -612,7 +612,7 @@ export default function App(){
             <button onClick={()=>removeEx(i)} style={{width:26,height:22,borderRadius:6,cursor:"pointer",background:"rgba(226,128,255,0.06)",border:"1px solid rgba(226,128,255,0.15)",color:T.pk,fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>✕</button></div>
           <ExCard exId={exId} slotKey={slotKeys[i]} alts={routine.alts[exId]} onRest={tRest} nSets={routine.sets} swaps={swaps} onSwap={handleSwap} onData={handleExData} customObjs={customObjs} onObjChange={handleObjChange} fSc={fSc}/></div>))}
       {!showAddEx&&<button onClick={()=>setShowAddEx(true)} style={{width:"100%",padding:"14px",marginTop:8,background:"rgba(112,144,255,0.06)",border:"1.5px dashed rgba(112,144,255,0.25)",borderRadius:14,color:T.blL,fontSize:sz(13,fSc),fontWeight:700,cursor:"pointer"}}>+ Ajouter un exercice</button>}
-      {showAddEx&&<div style={{marginTop:8,padding:"16px",borderRadius:16,background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,animation:"fadeUp 0.3s ease both"}}>
+      {showAddEx&&<div style={{marginTop:8,padding:"16px",borderRadius:16,background:T.bgCard,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${T.bdM}`,animation:"fadeUp 0.3s ease both"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
           <div style={{fontSize:10,fontWeight:800,color:T.bl,letterSpacing:"1.5px",textTransform:"uppercase"}}>Ajouter un exercice</div>
           <button onClick={()=>{setShowAddEx(false);setAddExSearch("")}} style={{padding:"4px 10px",borderRadius:7,cursor:"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:T.t3,fontSize:11,fontWeight:700}}>✕</button></div>
@@ -646,7 +646,7 @@ export default function App(){
           <textarea value={sessionNotes} onChange={e=>setSessionNotes(e.target.value)} placeholder={"Tes ressentis, questions, ajustements...\nEx: Hack squat facile → monter à 150kg ?"} rows={4} style={{width:"100%",padding:"12px",borderRadius:10,background:T.bgInput,border:`1px solid ${T.bdM}`,color:T.w,fontSize:sz(13,fSc),outline:"none",fontFamily:"inherit",resize:"vertical",lineHeight:1.6,marginBottom:12,minHeight:80}}/>
           <button onClick={handleCopyReport} style={{width:"100%",padding:"13px",borderRadius:10,cursor:"pointer",background:copied?"rgba(92,232,250,0.15)":"rgba(112,144,255,0.1)",border:`1.5px solid ${copied?"rgba(92,232,250,0.35)":"rgba(112,144,255,0.28)"}`,color:copied?T.cy:T.blL,fontSize:sz(14,fSc),fontWeight:700,transition:"all 0.3s"}}>{copied?"✅ Copié !":"📋 Copier le rapport"}</button>
           {reportText&&<div style={{marginTop:12,textAlign:"left",padding:"12px",borderRadius:10,background:"rgba(13,18,32,0.3)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",maxHeight:160,overflowY:"auto"}}><pre style={{margin:0,fontSize:10,color:T.t3,whiteSpace:"pre-wrap",fontFamily:"monospace",lineHeight:1.5}}>{reportText.slice(0,400)}{reportText.length>400?"...":""}</pre></div>}</div>
-        <button onClick={resetToHome} style={{width:"100%",padding:"14px",borderRadius:12,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bd}`,color:T.t2,fontSize:sz(14,fSc),fontWeight:600}}>Retour</button>
+        <button onClick={resetToHome} style={{width:"100%",padding:"14px",borderRadius:12,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${T.bd}`,color:T.t2,fontSize:sz(14,fSc),fontWeight:600}}>Retour</button>
       </div></div></div>)}
 
   /* ═══ SESSIONS (Stats + Historique + 1RM fusionnés) ═══ */
@@ -688,7 +688,7 @@ export default function App(){
 
         {/* Progress */}
         {sTab==="progress"&&<div>{selEx?(<div>
-          <button onClick={()=>setSelEx(null)} style={{padding:"6px 14px",borderRadius:8,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:12,fontWeight:600,marginBottom:12}}>← Retour</button>
+          <button onClick={()=>setSelEx(null)} style={{padding:"6px 14px",borderRadius:8,cursor:"pointer",background:T.bgCard,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:12,fontWeight:600,marginBottom:12}}>← Retour</button>
           <div style={{...card,padding:"16px"}}>
             <div style={{fontSize:sz(16,fSc),fontWeight:800,color:T.w,marginBottom:4}}>{EX[selEx].name}</div>
             <div style={{fontSize:sz(11,fSc),color:T.t3,marginBottom:12}}>{EX[selEx].muscle} · {EX[selEx].hist.length} séances · 1RM: {e1rm(EX[selEx].hist[EX[selEx].hist.length-1].kg,EX[selEx].hist[EX[selEx].hist.length-1].r)}kg</div>
@@ -754,7 +754,7 @@ export default function App(){
           <h2 style={{margin:0,fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Corps</h2>
           <button onClick={()=>setShowForm(!showForm)} style={{padding:"8px 16px",borderRadius:10,cursor:"pointer",background:showForm?"rgba(226,128,255,0.1)":"rgba(112,144,255,0.1)",border:`1px solid ${showForm?"rgba(226,128,255,0.25)":"rgba(112,144,255,0.25)"}`,color:showForm?T.pk:T.blL,fontSize:sz(12,fSc),fontWeight:700}}>{showForm?"✕ Fermer":"+ Mesure"}</button></div></div>
       {showForm&&<div style={{padding:"0 16px",marginBottom:16,animation:"fadeUp 0.3s ease both"}}>
-        <div style={{padding:"16px",borderRadius:16,background:T.bgCard,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:`1px solid ${T.bdM}`}}>
+        <div style={{padding:"16px",borderRadius:16,background:T.bgCard,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:`1px solid ${T.bdM}`}}>
           <div style={{fontSize:10,fontWeight:800,color:T.vi,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:12}}>📐 Nouvelle mesure</div>
           <div style={{marginBottom:12}}><label style={{fontSize:11,color:T.t3,fontWeight:600,display:"block",marginBottom:4}}>Date</label>
             <input type="date" value={formData.date} onChange={e=>setFormData(p=>({...p,date:e.target.value}))} style={{width:"100%",padding:"10px 12px",borderRadius:9,background:T.bgInput,border:`1px solid ${T.bdM}`,color:T.w,fontSize:14,outline:"none",fontFamily:"inherit"}}/></div>
