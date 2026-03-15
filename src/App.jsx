@@ -418,7 +418,7 @@ export default function App(){
     const wPct=Math.min(waterToday.total/waterGoal*100,100);
     return(<div style={shell}><style>{css}</style>
     {/* Goku full background */}
-    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.22,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 40%, transparent 85%)",WebkitMaskImage:"linear-gradient(to bottom, black 40%, transparent 85%)"}}/>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.14,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
     <div style={{position:"relative",zIndex:1}}>
       {/* Logo + Countdown */}
       <div style={{textAlign:"center",paddingTop:`calc(30px + ${safeTop})`,paddingBottom:12}}>
@@ -470,6 +470,7 @@ export default function App(){
     const isNew=editKey.startsWith("new_")||editKey.startsWith("dup_");
     const emojis=["💪","🦵","🏋️","⚡","🔥","💎","🎯","🚀","💥","🏆"];
     return(<div style={shell}><style>{css}</style>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.14,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
     <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -540,6 +541,7 @@ export default function App(){
     const wPct=Math.min(waterToday.total/waterGoal*100,100);
     const wHist=DB.getWaterHistory(7);const maxW=Math.max(...wHist.map(d=>d.total),waterGoal);
     return(<div style={shell}><style>{css}</style>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.14,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
     <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Quotidien</h2></div>
     <div style={{display:"flex",padding:"0 16px",gap:6,marginBottom:16}}>
       {[{id:"water",l:"💧 Eau"},{id:"macros",l:"🍎 Macros"},{id:"report",l:"📋 Rapport"}].map(t=><button key={t.id} onClick={()=>setDailyTab(t.id)} style={tabBtn(dailyTab===t.id)}>{t.l}</button>)}</div>
@@ -658,6 +660,7 @@ export default function App(){
     const rmBoard=Object.entries(EX).filter(([_,e])=>e.hist?.length>0).map(([id,e])=>{const best=e.hist.reduce((b,h)=>{const rm=e1rm(h.kg,h.r);return rm>b.rm?{...h,rm,id}:b},{rm:0,id});return{id,name:e.name,muscle:e.muscle,rm:best.rm,kg:best.kg,r:best.r}}).filter(x=>x.rm>0).sort((a,b)=>b.rm-a.rm);
 
     return(<div style={shell}><style>{css}</style>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.14,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
       <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Séances</h2></div>
       <div style={{display:"flex",padding:"0 16px",gap:4,marginBottom:16,flexWrap:"wrap"}}>
         {[{id:"prs",l:"🏆 PRs"},{id:"1rm",l:"💎 1RM"},{id:"progress",l:"📈 Courbes"},{id:"volume",l:"💪 Volume"},{id:"chrono",l:"📅 Historique"},{id:"routine",l:"🔁 Routines"}].map(t=>(
@@ -746,6 +749,7 @@ export default function App(){
     const handleAddMensur=()=>{const entry={date:formData.date};MENSUR_FIELDS.forEach(f=>{if(formData[f.key]&&formData[f.key]!=="")entry[f.key]=parseFloat(formData[f.key])});
       if(Object.keys(entry).length>1){setMensur(DB.addMensuration(entry));setShowForm(false);setFormData({date:localDate(),poids:"",bf:"",ventre:"",poitrine:"",cuisse:"",bras:"",muscle:"",meta:""})}};
     return(<div style={shell}><style>{css}</style>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.14,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
       <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
           <h2 style={{margin:0,fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Corps</h2>
@@ -792,6 +796,7 @@ export default function App(){
     const handleReset=()=>{DB.resetAll();setSwaps({});setCustomObjs({});setSessHist(INIT_HISTORY);setLastDates({...LAST_SESSIONS});setMensur([...INIT_MENSUR]);setRoutines({...INIT_ROUTINES});setSettings({fontSize:"normal",waterGoal:3000});setShowReset(false)};
     const lastExp=DB.getLastExport();const expDays=lastExp?Math.floor((new Date()-new Date(lastExp+"T12:00:00"))/(1000*60*60*24)):null;
     return(<div style={shell}><style>{css}</style>
+    <img src="/goku_home.jpg" alt="" style={{position:"fixed",top:"12%",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:500,height:"auto",opacity:0.14,pointerEvents:"none",zIndex:0,maskImage:"linear-gradient(to bottom, black 50%, transparent 90%)",WebkitMaskImage:"linear-gradient(to bottom, black 50%, transparent 90%)"}}/>
       <div style={{padding:`calc(16px + ${safeTop}) 20px 16px`}}><Logo sz="sm"/><h2 style={{margin:"12px 0 0",fontSize:sz(22,fSc),fontWeight:800,color:T.w}}>Réglages</h2></div>
       <div style={{padding:"0 16px",paddingBottom:80}}>
         <div style={{...card,marginBottom:10,animation:"fadeUp 0.3s ease both"}}>
