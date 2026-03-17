@@ -296,7 +296,7 @@ export default function App(){
   useEffect(()=>{DB.setSwaps(swaps)},[swaps]);
   useEffect(()=>{DB.setSettings(settings)},[settings]);
   useEffect(()=>{DB.setRoutines(routines)},[routines]);
-  useEffect(()=>{if(rKey&&scr==="workout"){const exs=routines[rKey].exercises.slice();setExOrder(exs);setSlotKeys(exs.map(()=>"s"+(slotCounter.current++)))}},[rKey,scr]);
+  useEffect(()=>{if(rKey&&scr==="workout"){const raw=routines[rKey].exercises;const exs=raw.map(e=>typeof e==="string"?e:e.id);setExOrder(exs);setSlotKeys(exs.map(()=>"s"+(slotCounter.current++)))}},[rKey,scr]);
   useEffect(()=>{const ce=DB.getCustomExercises();Object.entries(ce).forEach(([id,ex])=>{if(!EX[id])EX[id]=ex})},[]);
 
   const handleObjChange=(exId,obj)=>{setCustomObjs(p=>{const n={...p,[exId]:obj};DB.setObjective(exId,obj);return n})};
@@ -406,7 +406,7 @@ export default function App(){
 
   const css=`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=number]{-moz-appearance:textfield}body{margin:0;background:${T.bg}}
-    @keyframes fadeUp{from{transform:translateY(10px)}to{transform:translateY(0)}}@keyframes auraFloat{0%,100%{opacity:0.5;transform:translateY(0)}50%{opacity:0.9;transform:translateY(-8px)}}
+    @keyframes fadeUp{from{}to{}}@keyframes auraFloat{0%,100%{opacity:0.5;transform:translateY(0)}50%{opacity:0.9;transform:translateY(-8px)}}
     @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(192,208,255,0.15))}50%{filter:drop-shadow(0 0 35px rgba(192,208,255,0.3))}}`;
   const safeTop="env(safe-area-inset-top, 20px)";
   const shell={fontFamily:"'Outfit',-apple-system,sans-serif",background:T.bg,color:T.w,minHeight:"100vh",paddingBottom:"calc(80px + env(safe-area-inset-bottom, 0px))",position:"relative"};
@@ -454,7 +454,7 @@ export default function App(){
                   <div style={{fontSize:28,marginBottom:6}}>{r.emoji}</div>
                   <div style={{fontSize:9,fontWeight:700,letterSpacing:"1.5px",color:T.bl,marginBottom:6}}>{r.tag}</div>
                   <div style={{fontSize:sz(17,fSc),fontWeight:800,color:T.w}}>{r.name}</div>
-                  <div style={{fontSize:sz(11,fSc),color:T.t3,marginTop:3}}>{r.exercises.length} exos · {r.sets} séries</div>
+                  <div style={{fontSize:sz(11,fSc),color:T.t3,marginTop:3}}>{r.exercises.length} exos · {r.exercises.reduce((s,e)=>s+(typeof e==="object"&&e.sets?e.sets:r.sets),0)} séries</div>
                   {ld&&<div style={{fontSize:sz(10,fSc),color:T.t4,marginTop:6,fontWeight:600,display:"flex",alignItems:"center",gap:4}}><span style={{color:T.vi}}>●</span> {ago(ld)}</div>}
                 </div></button>
               <button onClick={()=>openEditor(key)} style={{position:"absolute",top:8,right:8,width:28,height:28,borderRadius:8,cursor:"pointer",background:"rgba(168,140,255,0.1)",border:"1px solid rgba(168,140,255,0.2)",color:T.vi,fontSize:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,zIndex:2}}>✏️</button>
@@ -515,7 +515,7 @@ export default function App(){
               <button onClick={()=>edMoveEx(i,-1)} disabled={i===0} style={{width:22,height:18,borderRadius:4,cursor:i===0?"default":"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:i===0?T.t4:T.t2,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",padding:0,opacity:i===0?0.3:1}}>↑</button>
               <button onClick={()=>edMoveEx(i,1)} disabled={i===editForm.exercises.length-1} style={{width:22,height:18,borderRadius:4,cursor:i===editForm.exercises.length-1?"default":"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:i===editForm.exercises.length-1?T.t4:T.t2,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",padding:0,opacity:i===editForm.exercises.length-1?0.3:1}}>↓</button>
             </div>
-            <div style={{flex:1}}><span style={{fontSize:sz(13,fSc),fontWeight:600,color:T.w}}>{ex?.name||exId}</span><span style={{fontSize:10,color:T.t4,marginLeft:6}}>{ex?.muscle||""}</span></div>
+            <div style={{flex:1}}><span style={{fontSize:sz(13,fSc),fontWeight:600,color:T.w}}>{ex?.name||exId}</span><span style={{fontSize:10,color:T.t4,marginLeft:6}}>{ex?.muscle||""}</span><span style={{fontSize:10,color:T.bl,marginLeft:6}}>{typeof editForm.exercises[i]==="object"?editForm.exercises[i].sets+"s":""}</span></div>
             <button onClick={()=>edRemoveEx(i)} style={{width:24,height:24,borderRadius:6,cursor:"pointer",background:"rgba(226,128,255,0.06)",border:"1px solid rgba(226,128,255,0.15)",color:T.pk,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>✕</button>
           </div>)})}
 
@@ -610,7 +610,7 @@ export default function App(){
             <button onClick={()=>moveEx(i,-1)} disabled={i===0} style={{width:26,height:22,borderRadius:6,cursor:i===0?"default":"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:i===0?T.t4:T.t2,fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",padding:0,opacity:i===0?0.3:1}}>↑</button>
             <button onClick={()=>moveEx(i,1)} disabled={i===exOrder.length-1} style={{width:26,height:22,borderRadius:6,cursor:i===exOrder.length-1?"default":"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:i===exOrder.length-1?T.t4:T.t2,fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",padding:0,opacity:i===exOrder.length-1?0.3:1}}>↓</button>
             <button onClick={()=>removeEx(i)} style={{width:26,height:22,borderRadius:6,cursor:"pointer",background:"rgba(226,128,255,0.06)",border:"1px solid rgba(226,128,255,0.15)",color:T.pk,fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>✕</button></div>
-          <ExCard exId={exId} slotKey={slotKeys[i]} alts={routine.alts[exId]} onRest={tRest} nSets={routine.sets} swaps={swaps} onSwap={handleSwap} onData={handleExData} customObjs={customObjs} onObjChange={handleObjChange} fSc={fSc}/></div>))}
+          <ExCard exId={exId} slotKey={slotKeys[i]} alts={routine.alts[exId]} onRest={tRest} nSets={(() => {const e=routine.exercises[i];return typeof e==="object"&&e.sets?e.sets:routine.sets})()} swaps={swaps} onSwap={handleSwap} onData={handleExData} customObjs={customObjs} onObjChange={handleObjChange} fSc={fSc}/></div>))}
       {!showAddEx&&<button onClick={()=>setShowAddEx(true)} style={{width:"100%",padding:"14px",marginTop:8,background:"rgba(112,144,255,0.06)",border:"1.5px dashed rgba(112,144,255,0.25)",borderRadius:14,color:T.blL,fontSize:sz(13,fSc),fontWeight:700,cursor:"pointer"}}>+ Ajouter un exercice</button>}
       {showAddEx&&<div style={{marginTop:8,padding:"16px",borderRadius:16,background:T.bgCard,border:`1px solid ${T.bdM}`,animation:"fadeUp 0.3s ease both"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
