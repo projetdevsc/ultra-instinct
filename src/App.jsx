@@ -213,7 +213,8 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const lp=last(aId);const prR=prBest(aId);const st=smartTarget(aId);
   const defaultObj=OBJ[aId]||"";const customObj=customObjs[aId];const obj=customObj?.text||defaultObj;const objMode=customObj?.mode||"default";
   const prev=lp?Array(nSets).fill(lp):null;
-  const[sets,setSets]=useState(Array(nSets).fill(null).map(()=>({kg:0,reps:0,done:false})));
+  const initKg=st?st.kg:lp?lp.kg:0;const initReps=st?st.r:lp?lp.r:0;
+  const[sets,setSets]=useState(Array(nSets).fill(null).map(()=>({kg:initKg,reps:initReps,done:false})));
   const[open,setOpen]=useState(true);const[prs,setPrs]=useState([]);const[rest,setRest]=useState(ax.rest||120);const[showSwap,setShowSwap]=useState(false);const[search,setSearch]=useState("");
   const[showObj,setShowObj]=useState(false);const[objInput,setObjInput]=useState(customObj?.text||"");
   const done=sets.filter(s=>s.done).length;const allD=done===sets.length&&done>0;const aList=alts||[];
@@ -221,7 +222,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const filtered=search.length>0?allExList.filter(e=>e.name.toLowerCase().includes(search.toLowerCase())||e.muscle.toLowerCase().includes(search.toLowerCase())):aList.length>0?[{id:exId,...EX[exId]},...aList.map(a=>({id:a,...EX[a]}))]:allExList.slice(0,8);
   useEffect(()=>{if(onData){const validSets=sets.filter(s=>s.done&&s.kg>0);const bestSet=validSets.length>0?validSets.reduce((b,s)=>s.kg>b.kg?s:b,validSets[0]):null;onData(slotKey,{activeId:aId,name:ax.name,muscle:ax.muscle,sets:sets.map(s=>({kg:s.kg,reps:s.reps,done:s.done,isPR:s.kg>0&&prR&&s.kg>prR.kg})),bestSet,prevBest:lp,hasPR:prs.length>0,objective:obj})}},[sets,prs]);
   const validate=i=>{const n=[...sets];n[i].done=true;setSets(n);if(prR&&n[i].kg>prR.kg)setPrs(p=>[...p,i]);onRest(rest,ax.name)};
-  const swap=nId=>{setAId(nId);onSwap(exId,nId);setRest(EX[nId]?.rest||120);setSets(Array(nSets).fill(null).map(()=>({kg:0,reps:0,done:false})));setPrs([]);setShowSwap(false);setSearch("");setObjInput(customObjs[nId]?.text||OBJ[nId]||"")};
+  const swap=nId=>{setAId(nId);onSwap(exId,nId);setRest(EX[nId]?.rest||120);const nst=smartTarget(nId);const nlp=last(nId);const nkg=nst?nst.kg:nlp?nlp.kg:0;const nr=nst?nst.r:nlp?nlp.r:0;setSets(Array(nSets).fill(null).map(()=>({kg:nkg,reps:nr,done:false})));setPrs([]);setShowSwap(false);setSearch("");setObjInput(customObjs[nId]?.text||OBJ[nId]||"")};
   const setObjMode=(mode)=>{let text="";if(mode==="up"&&lp)text=`${lp.kg+5}kg × ${lp.r}`;else if(mode==="stable"&&lp)text=`${lp.kg}kg × ${lp.r+2}`;else if(mode==="custom")text=objInput||defaultObj;else text=defaultObj;setObjInput(text);onObjChange(aId,{mode,text});setShowObj(false)};
   const saveCustomObj=()=>{onObjChange(aId,{mode:"custom",text:objInput});setShowObj(false)};
   return(<div style={{background:allD?"linear-gradient(135deg,rgba(92,232,250,0.04),rgba(112,144,255,0.03))":T.bgCard,border:`1px solid ${allD?"rgba(92,232,250,0.12)":T.bd}`,borderRadius:16,marginBottom:10}}>
@@ -643,15 +644,18 @@ export default function App(){
     const allExForAdd=Object.entries(EX).map(([id,e])=>({id,name:e.name,muscle:e.muscle}));
     const addF=addExSearch.length>0?allExForAdd.filter(e=>e.name.toLowerCase().includes(addExSearch.toLowerCase())||e.muscle.toLowerCase().includes(addExSearch.toLowerCase())):[];
     return(<div style={shell}><style>{css}</style>
-    <div style={{position:"sticky",top:0,zIndex:50,padding:`calc(10px + ${safeTop}) 16px 14px`,background:"rgba(13,18,32,0.7)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderBottom:`1px solid ${T.bdM}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-      <div style={{display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={resetToHome} style={{width:34,height:34,borderRadius:9,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:16,fontWeight:700,padding:0}}>←</button>
-        <div><div style={{display:"flex",alignItems:"center",gap:10}}>
-          <span style={{fontSize:15,fontWeight:900,letterSpacing:"0.5px",background:T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:"drop-shadow(0 0 10px rgba(192,208,255,0.2))"}}>UI</span>
-          <div style={{padding:"3px 10px",borderRadius:7,background:T.bgInput,border:`1px solid ${T.bdM}`,display:"flex",alignItems:"center",gap:6}}>
-            <span style={{fontSize:14}}>{routine.emoji}</span><span style={{fontSize:sz(12,fSc),fontWeight:700,color:T.t1}}>{routine.name}</span></div></div>
-          <div style={{fontSize:15,fontWeight:800,color:T.bl,fontVariantNumeric:"tabular-nums",marginTop:5,fontFamily:"monospace"}}>{fm(elapsed)}</div></div></div>
-      <button onClick={finish} style={{padding:"9px 22px",borderRadius:10,cursor:"pointer",background:"rgba(92,232,250,0.08)",border:"1px solid rgba(92,232,250,0.22)",color:T.cy,fontSize:13,fontWeight:700}}>Terminer ✓</button></div>
+    <div style={{position:"sticky",top:0,zIndex:50,padding:`calc(10px + ${safeTop}) 16px 10px`,background:"rgba(13,18,32,0.7)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderBottom:`1px solid ${T.bdM}`}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={resetToHome} style={{width:34,height:34,borderRadius:9,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bdM}`,color:T.t2,fontSize:16,fontWeight:700,padding:0}}>←</button>
+          <div><div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:15,fontWeight:900,letterSpacing:"0.5px",background:T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:"drop-shadow(0 0 10px rgba(192,208,255,0.2))"}}>UI</span>
+            <div style={{padding:"3px 10px",borderRadius:7,background:T.bgInput,border:`1px solid ${T.bdM}`,display:"flex",alignItems:"center",gap:6}}>
+              <span style={{fontSize:14}}>{routine.emoji}</span><span style={{fontSize:sz(12,fSc),fontWeight:700,color:T.t1}}>{routine.name}</span></div></div></div></div>
+        <button onClick={finish} style={{padding:"9px 22px",borderRadius:10,cursor:"pointer",background:"rgba(92,232,250,0.08)",border:"1px solid rgba(92,232,250,0.22)",color:T.cy,fontSize:13,fontWeight:700}}>Terminer ✓</button></div>
+      <div style={{textAlign:"center",marginTop:6}}>
+        <span style={{fontSize:32,fontWeight:900,fontVariantNumeric:"tabular-nums",fontFamily:"monospace",background:T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:"drop-shadow(0 0 12px rgba(192,208,255,0.2))"}}>{fm(elapsed)}</span>
+      </div></div>
     <div style={{padding:"14px 12px",paddingBottom:timer?150:80}}>
       {routine.warmup&&<div style={{padding:"12px 16px",borderRadius:14,marginBottom:12,background:"rgba(255,184,110,0.06)",border:"1px solid rgba(255,184,110,0.15)"}}><div style={{fontSize:10,fontWeight:800,color:T.wa,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:6}}>🔥 Échauffement général</div>
         <div style={{fontSize:sz(12,fSc),color:T.t2,lineHeight:1.7}}>{routine.warmup.split("→").map((s,i)=><span key={i}>{i>0&&<span style={{color:T.wa}}> → </span>}{s.trim()}</span>)}</div></div>}
