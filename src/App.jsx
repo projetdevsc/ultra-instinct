@@ -218,8 +218,43 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const lp=last(aId);const prR=prBest(aId);const st=smartTarget(aId);
   const defaultObj=OBJ[aId]||"";const customObj=customObjs[aId];const obj=customObj?.text||defaultObj;const objMode=customObj?.mode||"default";
   const prev=lp?Array(nSets).fill(lp):null;
-  const initKg=st?st.kg:lp?lp.kg:0;const initReps=st?st.r:lp?lp.r:0;
-  const[sets,setSets]=useState(Array(nSets).fill(null).map(()=>({kg:initKg,reps:initReps,done:false})));
+  const targetKg=st?st.kg:lp?lp.kg:0;const targetReps=st?st.r:lp?lp.r:0;
+
+  // Detect compound vs isolation from rest time
+  const isCompound=ax.rest>=120;
+  // Detect equipment type for rounding
+  const nm=(ax.name||"").toLowerCase();
+  const isDumbbell=nm.includes("haltère")||nm.includes("marteau")||nm.includes("pupitre");
+  const roundStep=isDumbbell?2:kg>=40?5:2.5;
+  // Build smart set loading
+  const buildSets=(n,kg,reps)=>{
+    if(!kg||!isCompound||n<=2)return Array(n).fill(null).map(()=>({kg,reps,done:false}));
+    const round=(v)=>{if(isDumbbell)return Math.round(v/2)*2;return Math.round(v/roundStep)*roundStep};
+    if(n===3){
+      return[
+        {kg:round(kg*0.75),reps,done:false},
+        {kg,reps,done:false},
+        {kg,reps,done:false}
+      ];
+    }
+    if(n===4){
+      return[
+        {kg:round(kg*0.65),reps,done:false},
+        {kg,reps,done:false},
+        {kg,reps,done:false},
+        {kg,reps,done:false}
+      ];
+    }
+    if(n>=5){
+      return[
+        {kg:round(kg*0.6),reps,done:false},
+        {kg:round(kg*0.8),reps,done:false},
+        ...Array(n-2).fill(null).map(()=>({kg,reps,done:false}))
+      ];
+    }
+    return Array(n).fill(null).map(()=>({kg,reps,done:false}));
+  };
+  const[sets,setSets]=useState(buildSets(nSets,targetKg,targetReps));
   const[open,setOpen]=useState(true);const[prs,setPrs]=useState([]);const[rest,setRest]=useState(ax.rest||120);const[showSwap,setShowSwap]=useState(false);const[search,setSearch]=useState("");
   const[showObj,setShowObj]=useState(false);const[objInput,setObjInput]=useState(customObj?.text||"");
   const done=sets.filter(s=>s.done).length;const allD=done===sets.length&&done>0;const aList=alts||[];
@@ -227,7 +262,14 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const filtered=search.length>0?allExList.filter(e=>e.name.toLowerCase().includes(search.toLowerCase())||e.muscle.toLowerCase().includes(search.toLowerCase())):aList.length>0?[{id:exId,...EX[exId]},...aList.map(a=>({id:a,...EX[a]}))]:allExList.slice(0,8);
   useEffect(()=>{if(onData){const validSets=sets.filter(s=>s.done&&s.kg>0);const bestSet=validSets.length>0?validSets.reduce((b,s)=>s.kg>b.kg?s:b,validSets[0]):null;onData(slotKey,{activeId:aId,name:ax.name,muscle:ax.muscle,sets:sets.map(s=>({kg:s.kg,reps:s.reps,done:s.done,isPR:s.kg>0&&prR&&s.kg>prR.kg})),bestSet,prevBest:lp,hasPR:prs.length>0,objective:obj})}},[sets,prs]);
   const validate=i=>{const n=[...sets];n[i].done=true;setSets(n);if(prR&&n[i].kg>prR.kg)setPrs(p=>[...p,i]);onRest(rest,ax.name)};
-  const swap=nId=>{setAId(nId);onSwap(exId,nId);setRest(EX[nId]?.rest||120);const nst=smartTarget(nId);const nlp=last(nId);const nkg=nst?nst.kg:nlp?nlp.kg:0;const nr=nst?nst.r:nlp?nlp.r:0;setSets(Array(nSets).fill(null).map(()=>({kg:nkg,reps:nr,done:false})));setPrs([]);setShowSwap(false);setSearch("");setObjInput(customObjs[nId]?.text||OBJ[nId]||"")};
+  const swap=nId=>{setAId(nId);onSwap(exId,nId);const nex=EX[nId]||{rest:120,name:""};setRest(nex.rest||120);const nst=smartTarget(nId);const nlp=last(nId);const nkg=nst?nst.kg:nlp?nlp.kg:0;const nr=nst?nst.r:nlp?nlp.r:0;const nc=nex.rest>=120;
+    const nnm=(nex.name||"").toLowerCase();const ndb=nnm.includes("haltère")||nnm.includes("marteau")||nnm.includes("pupitre");
+    const nround=(v)=>ndb?Math.round(v/2)*2:nkg>=40?Math.round(v/5)*5:Math.round(v/2.5)*2.5;
+    const newSets=(!nkg||!nc||nSets<=2)?Array(nSets).fill(null).map(()=>({kg:nkg,reps:nr,done:false})):
+      nSets===3?[{kg:nround(nkg*0.75),reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false}]:
+      nSets===4?[{kg:nround(nkg*0.65),reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false}]:
+      [{kg:nround(nkg*0.6),reps:nr,done:false},{kg:nround(nkg*0.8),reps:nr,done:false},...Array(nSets-2).fill(null).map(()=>({kg:nkg,reps:nr,done:false}))];
+    setSets(newSets);setPrs([]);setShowSwap(false);setSearch("");setObjInput(customObjs[nId]?.text||OBJ[nId]||"")};
   const setObjMode=(mode)=>{let text="";if(mode==="up"&&lp)text=`${lp.kg+5}kg × ${lp.r}`;else if(mode==="stable"&&lp)text=`${lp.kg}kg × ${lp.r+2}`;else if(mode==="custom")text=objInput||defaultObj;else text=defaultObj;setObjInput(text);onObjChange(aId,{mode,text});setShowObj(false)};
   const saveCustomObj=()=>{onObjChange(aId,{mode:"custom",text:objInput});setShowObj(false)};
   return(<div style={{background:allD?"linear-gradient(135deg,rgba(92,232,250,0.04),rgba(112,144,255,0.03))":T.bgCard,border:`1px solid ${allD?"rgba(92,232,250,0.12)":T.bd}`,borderRadius:16,marginBottom:10}}>
