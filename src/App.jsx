@@ -135,42 +135,39 @@ const e1rm=(kg,r)=>r===1?kg:Math.round(kg*(1+r/30)*10)/10; // Epley formula
 // Smart target: calcule l'objectif dynamique basé sur l'historique
 const smartTarget=(exId)=>{
   const ex=EX[exId];if(!ex||!ex.hist||ex.hist.length===0)return null;
-  const h=ex.hist;const last=h[h.length-1];const prev=h.length>=2?h[h.length-2]:null;
+  const h=ex.hist;const lst=h[h.length-1];const prev=h.length>=2?h[h.length-2]:null;
   const name=(ex.name||"").toLowerCase();
   
-  // Detect mode: Force (6-8 reps) or Volume (12-15 reps) based on name or last reps
-  const isForce=name.includes("force")||last.r<=8;
-  const isVolume=name.includes("volume")||last.r>=12;
+  // Detect mode
+  const isForce=name.includes("force")||lst.r<=8;
+  const isVolume=name.includes("volume")||lst.r>=12;
+  
+  // Detect equipment for rounding
+  const isDumbbell=name.includes("haltère")||name.includes("marteau")||name.includes("pupitre")||name.includes("curl");
+  const kgStep=isDumbbell?2:lst.kg>=40?5:2.5;
+  const round=(v)=>isDumbbell?Math.round(v/2)*2:Math.round(v/kgStep)*kgStep;
   
   // Rep ranges
   const maxRep=isForce?8:isVolume?15:12;
   const minRep=isForce?6:isVolume?12:8;
-  const kgStep=isForce?5:2.5;
   
   if(!prev){
-    // First session: suggest same weight, aim for top of range
-    return{kg:last.kg,r:Math.min(last.r+1,maxRep),type:"same",label:"Consolider"};
+    return{kg:lst.kg,r:Math.min(lst.r+1,maxRep),type:"same",label:"Consolider"};
   }
   
-  // Compare last vs prev
-  const progressed=last.kg>prev.kg||(last.kg===prev.kg&&last.r>prev.r);
-  const regressed=last.kg<prev.kg||(last.kg===prev.kg&&last.r<prev.r);
-  const stagnated=last.kg===prev.kg&&last.r===prev.r;
+  const regressed=lst.kg<prev.kg||(lst.kg===prev.kg&&lst.r<prev.r);
+  const stagnated=lst.kg===prev.kg&&lst.r===prev.r;
   
-  if(last.r>=maxRep){
-    // Hit top of range → increase weight, reset to bottom
-    return{kg:last.kg+kgStep,r:minRep,type:"up",label:"Monter"};
+  if(lst.r>=maxRep){
+    return{kg:round(lst.kg+kgStep),r:minRep,type:"up",label:"Monter"};
   }
   if(regressed){
-    // Regressed → same weight, aim to recover prev reps
-    return{kg:last.kg,r:prev.r,type:"recover",label:"Rattraper"};
+    return{kg:lst.kg,r:prev.r,type:"recover",label:"Rattraper"};
   }
   if(stagnated){
-    // Stagnated → same weight, +1 rep
-    return{kg:last.kg,r:last.r+1,type:"push",label:"Pousser"};
+    return{kg:lst.kg,r:lst.r+1,type:"push",label:"Pousser"};
   }
-  // Normal progression: same weight, +1 rep
-  return{kg:last.kg,r:Math.min(last.r+1,maxRep),type:"progress",label:"Progresser"};
+  return{kg:lst.kg,r:Math.min(lst.r+1,maxRep),type:"progress",label:"Progresser"};
 };
 const waterL=(ml)=>{const l=ml/1000;return l===Math.floor(l)?l.toFixed(1):l<10?(Math.round(l*100)/100).toString():l.toFixed(1)};
 
@@ -229,17 +226,18 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   // Build smart set loading
   const buildSets=(n,kg,reps)=>{
     if(!kg||!isCompound||n<=2)return Array(n).fill(null).map(()=>({kg,reps,done:false}));
-    const round=(v)=>{if(isDumbbell)return Math.round(v/2)*2;return Math.round(v/roundStep)*roundStep};
+    const round=(v)=>{if(isDumbbell)return Math.round(v/2)*2;const s=kg>=40?5:2.5;return Math.round(v/s)*s};
+    // 1 warmup set at ~50%, rest all max
     if(n===3){
       return[
-        {kg:round(kg*0.75),reps,done:false},
+        {kg:round(kg*0.5),reps,done:false},
         {kg,reps,done:false},
         {kg,reps,done:false}
       ];
     }
     if(n===4){
       return[
-        {kg:round(kg*0.65),reps,done:false},
+        {kg:round(kg*0.5),reps,done:false},
         {kg,reps,done:false},
         {kg,reps,done:false},
         {kg,reps,done:false}
@@ -247,8 +245,8 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
     }
     if(n>=5){
       return[
-        {kg:round(kg*0.6),reps,done:false},
-        {kg:round(kg*0.8),reps,done:false},
+        {kg:round(kg*0.4),reps,done:false},
+        {kg:round(kg*0.65),reps,done:false},
         ...Array(n-2).fill(null).map(()=>({kg,reps,done:false}))
       ];
     }
@@ -263,12 +261,12 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   useEffect(()=>{if(onData){const validSets=sets.filter(s=>s.done&&s.kg>0);const bestSet=validSets.length>0?validSets.reduce((b,s)=>s.kg>b.kg?s:b,validSets[0]):null;onData(slotKey,{activeId:aId,name:ax.name,muscle:ax.muscle,sets:sets.map(s=>({kg:s.kg,reps:s.reps,done:s.done,isPR:s.kg>0&&prR&&s.kg>prR.kg})),bestSet,prevBest:lp,hasPR:prs.length>0,objective:obj})}},[sets,prs]);
   const validate=i=>{const n=[...sets];n[i].done=true;setSets(n);if(prR&&n[i].kg>prR.kg)setPrs(p=>[...p,i]);onRest(rest,ax.name)};
   const swap=nId=>{setAId(nId);onSwap(exId,nId);const nex=EX[nId]||{rest:120,name:""};setRest(nex.rest||120);const nst=smartTarget(nId);const nlp=last(nId);const nkg=nst?nst.kg:nlp?nlp.kg:0;const nr=nst?nst.r:nlp?nlp.r:0;const nc=nex.rest>=120;
-    const nnm=(nex.name||"").toLowerCase();const ndb=nnm.includes("haltère")||nnm.includes("marteau")||nnm.includes("pupitre");
+    const nnm=(nex.name||"").toLowerCase();const ndb=nnm.includes("haltère")||nnm.includes("marteau")||nnm.includes("pupitre")||nnm.includes("curl");
     const nround=(v)=>ndb?Math.round(v/2)*2:nkg>=40?Math.round(v/5)*5:Math.round(v/2.5)*2.5;
     const newSets=(!nkg||!nc||nSets<=2)?Array(nSets).fill(null).map(()=>({kg:nkg,reps:nr,done:false})):
-      nSets===3?[{kg:nround(nkg*0.75),reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false}]:
-      nSets===4?[{kg:nround(nkg*0.65),reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false}]:
-      [{kg:nround(nkg*0.6),reps:nr,done:false},{kg:nround(nkg*0.8),reps:nr,done:false},...Array(nSets-2).fill(null).map(()=>({kg:nkg,reps:nr,done:false}))];
+      nSets===3?[{kg:nround(nkg*0.5),reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false}]:
+      nSets===4?[{kg:nround(nkg*0.5),reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false},{kg:nkg,reps:nr,done:false}]:
+      [{kg:nround(nkg*0.4),reps:nr,done:false},{kg:nround(nkg*0.65),reps:nr,done:false},...Array(nSets-2).fill(null).map(()=>({kg:nkg,reps:nr,done:false}))];
     setSets(newSets);setPrs([]);setShowSwap(false);setSearch("");setObjInput(customObjs[nId]?.text||OBJ[nId]||"")};
   const setObjMode=(mode)=>{let text="";if(mode==="up"&&lp)text=`${lp.kg+5}kg × ${lp.r}`;else if(mode==="stable"&&lp)text=`${lp.kg}kg × ${lp.r+2}`;else if(mode==="custom")text=objInput||defaultObj;else text=defaultObj;setObjInput(text);onObjChange(aId,{mode,text});setShowObj(false)};
   const saveCustomObj=()=>{onObjChange(aId,{mode:"custom",text:objInput});setShowObj(false)};
