@@ -183,14 +183,19 @@ function RestTimer({duration,exName,onDone,onSkip}){
     iR.current=setInterval(()=>{setRem(p=>{if(p<=1){clearInterval(iR.current);cbR.current();return 0}return p-1})},1000);
     return()=>clearInterval(iR.current)},[duration]);
   const pct=((duration-rem)/duration)*100,urg=rem<=10;
-  return(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:200,background:`linear-gradient(180deg,rgba(13,18,32,0.97),${T.bg})`,backdropFilter:"blur(8px)",borderTop:`2px solid ${urg?"rgba(226,128,255,0.45)":"rgba(112,144,255,0.2)"}`}}>
-    {urg&&<div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",width:200,height:100,background:"radial-gradient(ellipse,rgba(226,128,255,0.15),transparent 70%)",pointerEvents:"none"}}/>}
-    <div style={{height:3,background:"rgba(112,144,255,0.08)"}}><div style={{height:"100%",background:urg?"linear-gradient(90deg,#E280FF,#FF70B0)":T.aura,width:`${pct}%`,transition:"width 1s linear",boxShadow:urg?"0 0 20px rgba(226,128,255,0.5)":"0 0 14px rgba(112,144,255,0.3)"}}/></div>
-    <div style={{padding:"18px 24px 32px",display:"flex",justifyContent:"space-between",alignItems:"center",position:"relative"}}>
-      <div><div style={{fontSize:11,fontWeight:700,color:urg?T.pkS:T.bl,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:8}}>⏱ Repos · {exName}</div>
-        <div style={{fontSize:52,fontWeight:900,lineHeight:1,fontVariantNumeric:"tabular-nums",background:urg?"linear-gradient(135deg,#E280FF,#FF70B0)":T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:urg?"drop-shadow(0 0 12px rgba(226,128,255,0.35))":"drop-shadow(0 0 8px rgba(192,208,255,0.15))"}}>{fm(rem)}</div></div>
-      <button onClick={onSkip} style={{padding:"11px 24px",borderRadius:11,cursor:"pointer",background:T.bgCard,border:`1px solid ${T.bdM}`,color:T.t2,fontSize:13,fontWeight:700}}>Skip →</button>
-    </div></div>);
+  return(<div onClick={onSkip} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:200,background:T.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+    {/* Glow background */}
+    <div style={{position:"absolute",width:300,height:300,borderRadius:"50%",background:urg?"radial-gradient(circle,rgba(226,128,255,0.12),transparent 70%)":"radial-gradient(circle,rgba(112,144,255,0.08),transparent 70%)",pointerEvents:"none",transition:"background 0.5s"}}/>
+    {/* Exercise name */}
+    <div style={{fontSize:14,fontWeight:700,color:urg?T.pkS:T.bl,letterSpacing:"2px",textTransform:"uppercase",marginBottom:20,position:"relative"}}>⏱ {exName}</div>
+    {/* Giant timer */}
+    <div style={{fontSize:120,fontWeight:900,lineHeight:1,fontVariantNumeric:"tabular-nums",fontFamily:"monospace",background:urg?"linear-gradient(135deg,#E280FF,#FF70B0)":T.ss,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:urg?"drop-shadow(0 0 30px rgba(226,128,255,0.4))":"drop-shadow(0 0 20px rgba(192,208,255,0.2))",position:"relative",transition:"filter 0.3s"}}>{fm(rem)}</div>
+    {/* Progress bar */}
+    <div style={{width:200,height:4,borderRadius:2,background:"rgba(180,200,255,0.08)",marginTop:30,overflow:"hidden",position:"relative"}}>
+      <div style={{height:"100%",borderRadius:2,background:urg?"linear-gradient(90deg,#E280FF,#FF70B0)":T.aura,width:`${pct}%`,transition:"width 1s linear",boxShadow:urg?"0 0 12px rgba(226,128,255,0.4)":"0 0 8px rgba(112,144,255,0.3)"}}/></div>
+    {/* Skip hint */}
+    <div style={{fontSize:12,color:T.t4,marginTop:20,fontWeight:600,position:"relative"}}>Touche pour skip</div>
+  </div>);
 }
 function RC({val,set}){const[o,sO]=useState(false);return(<div style={{position:"relative"}}><button onClick={e=>{e.stopPropagation();sO(!o)}} style={{padding:"4px 10px",borderRadius:7,cursor:"pointer",background:T.bgInput,border:`1px solid ${T.bdM}`,color:T.bl,fontSize:11,fontWeight:700,fontFamily:"monospace",display:"flex",alignItems:"center",gap:4}}><span style={{fontSize:10}}>⏱</span>{fm(val)}</button>
   {o&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:"100%",right:0,marginTop:6,zIndex:90,background:T.bgEl,border:`1px solid ${T.bdM}`,borderRadius:12,padding:6,width:190,display:"flex",flexWrap:"wrap",gap:4,boxShadow:"0 12px 48px rgba(0,0,0,0.6)"}}>
