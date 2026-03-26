@@ -225,7 +225,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   // Detect equipment type for rounding
   const nm=(ax.name||"").toLowerCase();
   const isDumbbell=nm.includes("haltère")||nm.includes("marteau")||nm.includes("pupitre");
-  const roundStep=isDumbbell?2:kg>=40?5:2.5;
+  const roundStep=isDumbbell?2:targetKg>=40?5:2.5;
   // Build smart set loading
   const buildSets=(n,kg,reps)=>{
     if(!kg||!isCompound||n<=2)return Array(n).fill(null).map(()=>({kg,reps,done:false}));
