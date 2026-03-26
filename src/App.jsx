@@ -297,7 +297,12 @@ export default function App(){
   useEffect(()=>{DB.setSettings(settings)},[settings]);
   useEffect(()=>{DB.setRoutines(routines)},[routines]);
   useEffect(()=>{if(rKey&&scr==="workout"){const raw=routines[rKey].exercises;const exs=raw.map(e=>typeof e==="string"?e:e.id);setExOrder(exs);setSlotKeys(exs.map(()=>"s"+(slotCounter.current++)))}},[rKey,scr]);
-  useEffect(()=>{const ce=DB.getCustomExercises();Object.entries(ce).forEach(([id,ex])=>{if(!EX[id])EX[id]=ex})},[]);
+  useEffect(()=>{
+    // Inject custom exercises
+    const ce=DB.getCustomExercises();Object.entries(ce).forEach(([id,ex])=>{if(!EX[id])EX[id]={...ex,hist:ex.hist||[]}; else if(ex.hist)EX[id].hist=ex.hist});
+    // Merge exHist (saved from sessions) into EX
+    const eh=DB.getExtraHist();Object.entries(eh).forEach(([id,entries])=>{if(EX[id]){const existing=EX[id].hist||[];const existingDates=new Set(existing.map(h=>h.d+h.kg+h.r));entries.forEach(e=>{if(!existingDates.has(e.d+e.kg+e.r)){existing.push(e);existingDates.add(e.d+e.kg+e.r)}});EX[id].hist=existing}})
+  },[]);
 
   const handleObjChange=(exId,obj)=>{setCustomObjs(p=>{const n={...p,[exId]:obj};DB.setObjective(exId,obj);return n})};
   const goR=k=>{setRKey(k);setStart(Date.now());setElapsed(0);setWorkoutData({});setPrCount(0);setSessionNotes("");setShowAddEx(false);setAddExSearch("");setScr("workout")};
@@ -314,7 +319,7 @@ export default function App(){
     const detail=Object.values(workoutData).filter(d=>d.sets.some(s=>s.done)).map(d=>({name:d.name,muscle:d.muscle,bestKg:d.bestSet?.kg||0,bestReps:d.bestSet?.reps||0,hasPR:d.hasPR}));
     const session={id:Date.now(),routine:rKey,date:today,duration:dur,exercises:Object.keys(workoutData).length||exOrder.length,prs,detail};
     setSessHist(DB.addSession(session));setLastDates(DB.setLastDate(rKey,today));
-    Object.entries(workoutData).forEach(([_,d])=>{if(d.bestSet&&d.bestSet.kg>0)DB.addExerciseEntry(d.activeId,{d:today,kg:d.bestSet.kg,r:d.bestSet.reps})});
+    Object.entries(workoutData).forEach(([_,d])=>{if(d.bestSet&&d.bestSet.kg>0){DB.addExerciseEntry(d.activeId,{d:today,kg:d.bestSet.kg,r:d.bestSet.reps});if(EX[d.activeId]){if(!EX[d.activeId].hist)EX[d.activeId].hist=[];EX[d.activeId].hist.push({d:today,kg:d.bestSet.kg,r:d.bestSet.reps})}}});
     const r=routines[rKey];const exR=Object.values(workoutData).filter(d=>d.sets.some(s=>s.done));
     setReportText(generateReport(r.name,r.emoji,dur,exR,new Date().toLocaleDateString("fr-FR"),""));setScr("summary");
   };
