@@ -391,8 +391,9 @@ export default function App(){
   };
   const deleteRoutine=(key)=>{setRoutines(p=>{const n={...p};delete n[key];return n});setScr("home");setEditKey(null);setEditForm(null)};
   const edMoveEx=(idx,dir)=>{const t=idx+dir;setEditForm(p=>{const exs=[...p.exercises];if(t<0||t>=exs.length)return p;[exs[idx],exs[t]]=[exs[t],exs[idx]];return{...p,exercises:exs}})};
-  const edAddEx=(exId)=>{setEditForm(p=>({...p,exercises:[...p.exercises,exId]}));setEditExSearch("")};
+  const edAddEx=(exId)=>{setEditForm(p=>({...p,exercises:[...p.exercises,{id:exId,sets:p.sets}]}));setEditExSearch("")};
   const edRemoveEx=(idx)=>{setEditForm(p=>({...p,exercises:p.exercises.filter((_,i)=>i!==idx)}))};
+  const edSetSets=(idx,n)=>{setEditForm(p=>{const exs=[...p.exercises];const e=exs[idx];exs[idx]=typeof e==="object"?{...e,sets:n}:{id:e,sets:n};return{...p,exercises:exs}})};
   const dupRoutine=(key)=>{const r=routines[key];const nk="dup_"+Date.now();setRoutines(p=>({...p,[nk]:{...r,name:r.name+" (copie)",exercises:[...r.exercises],alts:{...r.alts}}}))};
 
   const doExport=()=>{const data=DB.exportAll();const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`ui-backup-${localDate()}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);DB.setLastExport();setSettings(s=>({...s}))};
@@ -556,13 +557,16 @@ export default function App(){
       {/* Exercises */}
       <div style={{...card,marginBottom:10}}>
         <div style={{fontSize:10,fontWeight:800,color:T.bl,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>Exercices ({editForm.exercises.length})</div>
-        {editForm.exercises.map((exId,i)=>{const ex=EX[exId];return(
-          <div key={exId+i} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 0",borderBottom:`1px solid ${T.bd}`}}>
+        {editForm.exercises.map((exEntry,i)=>{const eid=typeof exEntry==="object"?exEntry.id:exEntry;const exSets=typeof exEntry==="object"?exEntry.sets:editForm.sets;const ex=EX[eid];return(
+          <div key={eid+i} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 0",borderBottom:`1px solid ${T.bd}`}}>
             <div style={{display:"flex",flexDirection:"column",gap:2}}>
               <button onClick={()=>edMoveEx(i,-1)} disabled={i===0} style={{width:22,height:18,borderRadius:4,cursor:i===0?"default":"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:i===0?T.t4:T.t2,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",padding:0,opacity:i===0?0.3:1}}>↑</button>
               <button onClick={()=>edMoveEx(i,1)} disabled={i===editForm.exercises.length-1} style={{width:22,height:18,borderRadius:4,cursor:i===editForm.exercises.length-1?"default":"pointer",background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,color:i===editForm.exercises.length-1?T.t4:T.t2,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",padding:0,opacity:i===editForm.exercises.length-1?0.3:1}}>↓</button>
             </div>
-            <div style={{flex:1}}><span style={{fontSize:sz(13,fSc),fontWeight:600,color:T.w}}>{ex?.name||exId}</span><span style={{fontSize:10,color:T.t4,marginLeft:6}}>{ex?.muscle||""}</span><span style={{fontSize:10,color:T.bl,marginLeft:6}}>{typeof editForm.exercises[i]==="object"?editForm.exercises[i].sets+"s":""}</span></div>
+            <div style={{flex:1}}><span style={{fontSize:sz(13,fSc),fontWeight:600,color:T.w}}>{ex?.name||eid}</span><span style={{fontSize:10,color:T.t4,marginLeft:6}}>{ex?.muscle||""}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:3}}>
+              {[1,2,3,4,5].map(n=><button key={n} onClick={()=>edSetSets(i,n)} style={{width:20,height:20,borderRadius:5,cursor:"pointer",fontSize:9,fontWeight:700,background:exSets===n?"rgba(112,144,255,0.15)":"rgba(180,200,255,0.03)",border:`1px solid ${exSets===n?"rgba(112,144,255,0.3)":T.bd}`,color:exSets===n?T.blL:T.t4,display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>{n}</button>)}
+            </div>
             <button onClick={()=>edRemoveEx(i)} style={{width:24,height:24,borderRadius:6,cursor:"pointer",background:"rgba(226,128,255,0.06)",border:"1px solid rgba(226,128,255,0.15)",color:T.pk,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>✕</button>
           </div>)})}
 
