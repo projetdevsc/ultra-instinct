@@ -131,6 +131,47 @@ const ago=d=>{if(!d)return"";const now=new Date();const then=new Date(d+"T12:00:
 const daysLeft=()=>Math.max(0,Math.ceil((DEADLINE-new Date())/(1000*60*60*24)));
 const sz=(base,sc)=>Math.round(base*sc);
 const e1rm=(kg,r)=>r===1?kg:Math.round(kg*(1+r/30)*10)/10; // Epley formula
+
+// Smart target: calcule l'objectif dynamique basé sur l'historique
+const smartTarget=(exId)=>{
+  const ex=EX[exId];if(!ex||!ex.hist||ex.hist.length===0)return null;
+  const h=ex.hist;const last=h[h.length-1];const prev=h.length>=2?h[h.length-2]:null;
+  const name=(ex.name||"").toLowerCase();
+  
+  // Detect mode: Force (6-8 reps) or Volume (12-15 reps) based on name or last reps
+  const isForce=name.includes("force")||last.r<=8;
+  const isVolume=name.includes("volume")||last.r>=12;
+  
+  // Rep ranges
+  const maxRep=isForce?8:isVolume?15:12;
+  const minRep=isForce?6:isVolume?12:8;
+  const kgStep=isForce?5:2.5;
+  
+  if(!prev){
+    // First session: suggest same weight, aim for top of range
+    return{kg:last.kg,r:Math.min(last.r+1,maxRep),type:"same",label:"Consolider"};
+  }
+  
+  // Compare last vs prev
+  const progressed=last.kg>prev.kg||(last.kg===prev.kg&&last.r>prev.r);
+  const regressed=last.kg<prev.kg||(last.kg===prev.kg&&last.r<prev.r);
+  const stagnated=last.kg===prev.kg&&last.r===prev.r;
+  
+  if(last.r>=maxRep){
+    // Hit top of range → increase weight, reset to bottom
+    return{kg:last.kg+kgStep,r:minRep,type:"up",label:"Monter"};
+  }
+  if(regressed){
+    // Regressed → same weight, aim to recover prev reps
+    return{kg:last.kg,r:prev.r,type:"recover",label:"Rattraper"};
+  }
+  if(stagnated){
+    // Stagnated → same weight, +1 rep
+    return{kg:last.kg,r:last.r+1,type:"push",label:"Pousser"};
+  }
+  // Normal progression: same weight, +1 rep
+  return{kg:last.kg,r:Math.min(last.r+1,maxRep),type:"progress",label:"Progresser"};
+};
 const waterL=(ml)=>{const l=ml/1000;return l===Math.floor(l)?l.toFixed(1):l<10?(Math.round(l*100)/100).toString():l.toFixed(1)};
 
 /* ═══ COMPONENTS ═══ */
@@ -169,7 +210,7 @@ function SR({i,prev,cur,up,val,done,isPR,fSc}){
 function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,onObjChange,fSc}){
   const swapped=swaps[exId];const[aId,setAId]=useState(swapped||exId);
   const ax=EX[aId]||{name:aId,muscle:"Custom",rest:120,hist:[]};
-  const lp=last(aId);const prR=prBest(aId);
+  const lp=last(aId);const prR=prBest(aId);const st=smartTarget(aId);
   const defaultObj=OBJ[aId]||"";const customObj=customObjs[aId];const obj=customObj?.text||defaultObj;const objMode=customObj?.mode||"default";
   const prev=lp?Array(nSets).fill(lp):null;
   const[sets,setSets]=useState(Array(nSets).fill(null).map(()=>({kg:0,reps:0,done:false})));
@@ -190,6 +231,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
         {prs.length>0&&<span style={{fontSize:9,fontWeight:800,color:T.pk,background:"rgba(226,128,255,0.1)",border:"1px solid rgba(226,128,255,0.2)",padding:"2px 8px",borderRadius:10}}>🏆 PR</span>}
         <button onClick={e=>{e.stopPropagation();setShowSwap(!showSwap)}} style={{fontSize:9,fontWeight:700,color:T.vi,background:"rgba(168,140,255,0.08)",border:"1px solid rgba(168,140,255,0.15)",padding:"2px 8px",borderRadius:8,cursor:"pointer"}}>⇄ swap</button></div>
       <div style={{fontSize:sz(11,fSc),color:T.t3,marginTop:3}}>{ax.muscle}{lp?` · ${lp.kg}kg × ${lp.r}`:""}
+        {st&&<span style={{marginLeft:6,fontSize:10,fontWeight:700,color:st.type==="up"?T.gn:st.type==="recover"?T.wa:T.cy,background:st.type==="up"?"rgba(138,232,160,0.1)":st.type==="recover"?"rgba(255,184,110,0.1)":"rgba(92,232,250,0.08)",border:`1px solid ${st.type==="up"?"rgba(138,232,160,0.2)":st.type==="recover"?"rgba(255,184,110,0.2)":"rgba(92,232,250,0.15)"}`,padding:"1px 7px",borderRadius:6}}>→ {st.kg}kg × {st.r} · {st.label}</span>}
         {obj&&<button onClick={e=>{e.stopPropagation();setShowObj(!showObj)}} style={{marginLeft:6,fontSize:10,color:T.vi,fontWeight:700,background:"rgba(168,140,255,0.06)",border:"1px solid rgba(168,140,255,0.12)",padding:"1px 7px",borderRadius:6,cursor:"pointer"}}>🎯 {obj} {objMode==="up"?"📈":objMode==="stable"?"🔒":""}</button>}
         {!obj&&<button onClick={e=>{e.stopPropagation();setShowObj(!showObj)}} style={{marginLeft:6,fontSize:10,color:T.t4,fontWeight:600,background:"rgba(180,200,255,0.04)",border:`1px solid ${T.bd}`,padding:"1px 7px",borderRadius:6,cursor:"pointer"}}>+ objectif</button>}</div></div>
       <div style={{display:"flex",alignItems:"center",gap:10}} onClick={e=>e.stopPropagation()}>
