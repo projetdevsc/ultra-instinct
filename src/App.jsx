@@ -138,11 +138,13 @@ const smartTarget=(exId)=>{
   const h=ex.hist;const lst=h[h.length-1];const prev=h.length>=2?h[h.length-2]:null;
   const name=(ex.name||"").toLowerCase();
   
-  // Detect mode
-  const isForce=name.includes("force")||lst.r<=8;
-  const isVolume=name.includes("volume")||lst.r>=12;
+  // Name ALWAYS overrides rep detection
+  const nameForce=name.includes("force");
+  const nameVolume=name.includes("volume");
+  const isForce=nameForce?true:nameVolume?false:lst.r<=8;
+  const isVolume=nameVolume?true:nameForce?false:lst.r>=12;
   
-  // Detect equipment for rounding
+  // Equipment detection for rounding
   const isDumbbell=name.includes("haltère")||name.includes("marteau")||name.includes("pupitre")||name.includes("curl");
   const kgStep=isDumbbell?2:lst.kg>=40?5:2.5;
   const round=(v)=>isDumbbell?Math.round(v/2)*2:Math.round(v/kgStep)*kgStep;
@@ -151,12 +153,29 @@ const smartTarget=(exId)=>{
   const maxRep=isForce?8:isVolume?15:12;
   const minRep=isForce?6:isVolume?12:8;
   
+  // COACHING: if reps are way below the mode range, weight is too heavy → reduce
+  if(lst.r<minRep-2){
+    // Scale down but not more than 25% — coach says lighten up, not start over
+    const scaled=round(lst.kg*0.75);
+    const targetKg=Math.max(scaled,round(lst.kg*lst.r/maxRep));
+    return{kg:targetKg,r:minRep,type:"adjust",label:"Adapter"};
+  }
+  
   if(!prev){
+    // Si les reps sont en dessous de la fourchette, baisser la charge
+    if(lst.r<minRep){
+      return{kg:round(lst.kg*0.85),r:minRep,type:"recover",label:"Trop lourd → baisser"};
+    }
     return{kg:lst.kg,r:Math.min(lst.r+1,maxRep),type:"same",label:"Consolider"};
   }
   
   const regressed=lst.kg<prev.kg||(lst.kg===prev.kg&&lst.r<prev.r);
   const stagnated=lst.kg===prev.kg&&lst.r===prev.r;
+  
+  // Si les reps sont en dessous de la fourchette, proposer de baisser
+  if(lst.r<minRep){
+    return{kg:round(lst.kg*0.85),r:minRep,type:"recover",label:"Trop lourd → baisser"};
+  }
   
   if(lst.r>=maxRep){
     return{kg:round(lst.kg+kgStep),r:minRep,type:"up",label:"Monter"};
@@ -217,8 +236,10 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const prev=lp?Array(nSets).fill(lp):null;
   const targetKg=st?st.kg:lp?lp.kg:0;const targetReps=st?st.r:lp?lp.r:0;
 
-  // Detect compound vs isolation from rest time
-  const isCompound=ax.rest>=120;
+  // Detect compound vs isolation — rest >= 90 on compound movements needs ramp
+  const exName=(ax.name||"").toLowerCase();
+  const isDumbbellEx=exName.includes("haltère")||exName.includes("marteau")||exName.includes("pupitre")||exName.includes("curl");
+  const isCompound=ax.rest>=90&&!isDumbbellEx&&targetKg>=40;
   // Detect equipment type for rounding
   const nm=(ax.name||"").toLowerCase();
   const isDumbbell=nm.includes("haltère")||nm.includes("marteau")||nm.includes("pupitre");
