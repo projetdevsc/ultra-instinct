@@ -235,14 +235,13 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const defaultObj=OBJ[aId]||"";const customObj=customObjs[aId];const obj=customObj?.text||defaultObj;const objMode=customObj?.mode||"default";
   const prev=lp?Array(nSets).fill(lp):null;
   const targetKg=st?st.kg:lp?lp.kg:0;const targetReps=st?st.r:lp?lp.r:0;
+  const[exNote,setExNote]=useState("");
 
-  // Detect compound vs isolation — rest >= 90 on compound movements needs ramp
-  const exName=(ax.name||"").toLowerCase();
-  const isDumbbellEx=exName.includes("haltère")||exName.includes("marteau")||exName.includes("pupitre")||exName.includes("curl");
-  const isCompound=ax.rest>=90&&!isDumbbellEx&&targetKg>=40;
+  // Detect compound vs isolation from rest time
+  const isCompound=ax.rest>=120;
   // Detect equipment type for rounding
   const nm=(ax.name||"").toLowerCase();
-  const isDumbbell=nm.includes("haltère")||nm.includes("marteau")||nm.includes("pupitre");
+  const isDumbbell=nm.includes("haltère")||nm.includes("marteau")||nm.includes("pupitre")||nm.includes("curl");
   const roundStep=isDumbbell?2:targetKg>=40?5:2.5;
   // Build smart set loading
   const buildSets=(n,kg,reps)=>{
@@ -279,7 +278,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
   const done=sets.filter(s=>s.done).length;const allD=done===sets.length&&done>0;const aList=alts||[];
   const allExList=Object.entries(EX).map(([id,e])=>({id,name:e.name,muscle:e.muscle}));
   const filtered=search.length>0?allExList.filter(e=>e.name.toLowerCase().includes(search.toLowerCase())||e.muscle.toLowerCase().includes(search.toLowerCase())):aList.length>0?[{id:exId,...EX[exId]},...aList.map(a=>({id:a,...EX[a]}))]:allExList.slice(0,8);
-  useEffect(()=>{if(onData){const validSets=sets.filter(s=>s.done&&s.kg>0);const bestSet=validSets.length>0?validSets.reduce((b,s)=>s.kg>b.kg?s:b,validSets[0]):null;onData(slotKey,{activeId:aId,name:ax.name,muscle:ax.muscle,sets:sets.map(s=>({kg:s.kg,reps:s.reps,done:s.done,isPR:s.kg>0&&prR&&s.kg>prR.kg})),bestSet,prevBest:lp,hasPR:prs.length>0,objective:obj})}},[sets,prs]);
+  useEffect(()=>{if(onData){const validSets=sets.filter(s=>s.done&&s.kg>0);const bestSet=validSets.length>0?validSets.reduce((b,s)=>s.kg>b.kg?s:b,validSets[0]):null;onData(slotKey,{activeId:aId,name:ax.name,muscle:ax.muscle,sets:sets.map(s=>({kg:s.kg,reps:s.reps,done:s.done,isPR:s.kg>0&&prR&&s.kg>prR.kg})),bestSet,prevBest:lp,hasPR:prs.length>0,objective:obj,note:exNote})}},[sets,prs,exNote]);
   const validate=i=>{const n=[...sets];n[i].done=true;setSets(n);if(prR&&n[i].kg>prR.kg)setPrs(p=>[...p,i]);onRest(rest,ax.name)};
   const swap=nId=>{setAId(nId);onSwap(exId,nId);const nex=EX[nId]||{rest:120,name:""};setRest(nex.rest||120);const nst=smartTarget(nId);const nlp=last(nId);const nkg=nst?nst.kg:nlp?nlp.kg:0;const nr=nst?nst.r:nlp?nlp.r:0;const nc=nex.rest>=120;
     const nnm=(nex.name||"").toLowerCase();const ndb=nnm.includes("haltère")||nnm.includes("marteau")||nnm.includes("pupitre")||nnm.includes("curl");
@@ -322,6 +321,7 @@ function ExCard({exId,slotKey,alts,onRest,nSets,swaps,onSwap,onData,customObjs,o
       <div style={{display:"grid",gridTemplateColumns:"30px 1fr 72px 72px 42px",gap:8,padding:"4px 0"}}>{["SET","PREV","KG","REPS",""].map((h,j)=><div key={j} style={{fontSize:9,fontWeight:800,color:T.t4,letterSpacing:"1.5px",textAlign:"center"}}>{h}</div>)}</div>
       {sets.map((s,i)=><SR key={i} i={i} prev={prev?.[i]} cur={s} up={u=>{const n=[...sets];n[i]={...u,done:s.done};setSets(n)}} val={()=>validate(i)} done={s.done} isPR={s.kg>0&&prR&&s.kg>prR.kg} fSc={fSc}/>)}
       <button onClick={()=>setSets([...sets,{kg:0,reps:0,done:false}])} style={{width:"100%",padding:"9px",marginTop:8,background:"none",border:`1.5px dashed ${T.bdM}`,borderRadius:9,color:T.t3,fontSize:12,fontWeight:600,cursor:"pointer"}}>+ Set</button>
+      <input type="text" placeholder="💬 Note sur cet exo..." value={exNote} onChange={e=>setExNote(e.target.value)} style={{width:"100%",padding:"8px 10px",marginTop:6,borderRadius:8,background:T.bgInput,border:`1px solid ${T.bd}`,color:T.t2,fontSize:sz(11,fSc),outline:"none",fontFamily:"inherit"}}/>
     </div>}</div>);
 }
 
@@ -432,7 +432,11 @@ export default function App(){
     const r=routines[rKey];const exR=Object.values(workoutData).filter(d=>d.sets.some(s=>s.done));
     setReportText(generateReport(r.name,r.emoji,dur,exR,new Date().toLocaleDateString("fr-FR"),""));setScr("summary");
   };
-  const handleCopyReport=async()=>{const r=routines[rKey];const exR=Object.values(workoutData).filter(d=>d.sets.some(s=>s.done));const fresh=generateReport(r.name,r.emoji,fm(elapsed),exR,new Date().toLocaleDateString("fr-FR"),sessionNotes);setReportText(fresh);const ok=await copyReport(fresh);setCopied(ok);setTimeout(()=>setCopied(false),2500)};
+  const handleCopyReport=async()=>{const r=routines[rKey];const exR=Object.values(workoutData).filter(d=>d.sets.some(s=>s.done));let fresh=generateReport(r.name,r.emoji,fm(elapsed),exR,new Date().toLocaleDateString("fr-FR"),sessionNotes);
+    // Append per-exercise notes
+    const exNotes=exR.filter(d=>d.note&&d.note.trim()).map(d=>`  💬 ${d.name}: ${d.note.trim()}`);
+    if(exNotes.length>0)fresh+=`\n\n📝 Notes exercices:\n${exNotes.join("\n")}`;
+    setReportText(fresh);const ok=await copyReport(fresh);setCopied(ok);setTimeout(()=>setCopied(false),2500)};
   const resetToHome=()=>{setScr("home");setRKey(null);setStart(null);setElapsed(0);setWorkoutData({});setReportText("");setSessionNotes("");setExOrder([]);setSlotKeys([]);setShowAddEx(false)};
   const tRest=useCallback((dur,name)=>setTimer({duration:dur,exerciseName:name}),[]);
   const handleSwap=(origId,newId)=>setSwaps(p=>({...p,[origId]:newId===origId?undefined:newId}));
@@ -470,6 +474,10 @@ export default function App(){
     // Also inject exercises into runtime EX
     if(data.exercises)Object.entries(data.exercises).forEach(([id,ex])=>{EX[id]=ex});
     setRoutines(newR);setCustomObjs(DB.getObjectives());setScr("home");alert("Programme importé !")}catch(err){alert("Fichier invalide: "+err.message)}};reader.readAsText(file)};
+  const doExportRoutines=()=>{const data={routines,exercises:DB.getCustomExercises(),objectives:DB.getObjectives()};
+    // Merge EX hist into exercises for complete export
+    Object.entries(data.exercises).forEach(([id,ex])=>{if(EX[id]&&EX[id].hist)ex.hist=EX[id].hist});
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`routines-export-${localDate()}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)};
 
   // Nutrition ↔ Performance correlation
   const getNutriBefore=(date,days=3)=>{
@@ -939,7 +947,9 @@ export default function App(){
         <div style={{...card,marginBottom:10,animation:"fadeUp 0.3s ease 0.13s both"}}>
           <div style={{fontSize:sz(14,fSc),fontWeight:700,color:T.w,marginBottom:4}}>🏋️ Importer un programme</div>
           <div style={{fontSize:11,color:T.t3,marginBottom:10}}>Remplace toutes les routines par un fichier JSON (exercices + objectifs inclus)</div>
-          <label style={{display:"block",padding:"10px",borderRadius:10,cursor:"pointer",background:"rgba(112,144,255,0.08)",border:"1px solid rgba(112,144,255,0.2)",color:T.blL,fontSize:sz(12,fSc),fontWeight:700,textAlign:"center"}}>🏋️ Importer routines (.json)<input type="file" accept=".json" onChange={doImportRoutines} style={{display:"none"}}/></label></div>
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={doExportRoutines} style={{flex:1,padding:"10px",borderRadius:10,cursor:"pointer",background:"rgba(168,140,255,0.08)",border:"1px solid rgba(168,140,255,0.2)",color:T.vi,fontSize:sz(12,fSc),fontWeight:700}}>📤 Exporter routines</button>
+            <label style={{flex:1,padding:"10px",borderRadius:10,cursor:"pointer",background:"rgba(112,144,255,0.08)",border:"1px solid rgba(112,144,255,0.2)",color:T.blL,fontSize:sz(12,fSc),fontWeight:700,textAlign:"center"}}>📥 Importer<input type="file" accept=".json" onChange={doImportRoutines} style={{display:"none"}}/></label></div></div>
         <div style={{...card,marginBottom:10,animation:"fadeUp 0.3s ease 0.15s both"}}>
           <div style={{fontSize:sz(14,fSc),fontWeight:700,color:T.w,marginBottom:4}}>🗑️ Réinitialiser</div>
           <div style={{fontSize:11,color:T.t3,marginBottom:12}}>Supprime toutes les données locales</div>
